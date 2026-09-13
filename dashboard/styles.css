@@ -1006,8 +1006,18 @@ input:checked + .slider:before {
 
 .config-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.config-card-full {
+  grid-column: 1 / -1;
 }
 
 .config-card {
@@ -1079,31 +1089,396 @@ input:checked + .slider:before {
   gap: 12px;
 }
 
-/* Groupe de fils de routage */
-.routing-threads-list {
+/* ============================================================================
+   SYSTÈME DE FILTRES DYNAMIQUES & ROUTAGE MULTI-RÈGLES DISCORD
+   ============================================================================ */
+
+.rules-header-row {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 14px;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.thread-row {
+.rules-header-title {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.thread-badge {
-  min-width: 95px;
+.rules-header-title h4 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.rules-count-badge {
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: rgba(6, 182, 212, 0.18);
+  color: var(--cyber-cyan);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.btn-add-rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  color: #38bdf8;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-rule:hover {
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.5);
+  transform: translateY(-1px);
+}
+
+.discord-rules-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.discord-rule-card {
+  background: rgba(10, 14, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.discord-rule-card:hover {
+  border-color: rgba(6, 182, 212, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.discord-rule-card.rule-disabled {
+  opacity: 0.5;
+  filter: grayscale(0.4);
+}
+
+.rule-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rule-name-input {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.rule-name-input:focus {
+  border-color: var(--cyber-cyan);
+  background: rgba(0, 0, 0, 0.6);
+  outline: none;
+  box-shadow: 0 0 10px var(--cyber-cyan-glow);
+}
+
+.rule-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-test-rule {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-test-rule:hover {
+  background: var(--cyber-emerald);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.btn-delete-rule {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: var(--cyber-rose);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-rule:hover {
+  background: var(--cyber-rose);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+}
+
+.rule-thread-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rule-thread-row label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.rule-thread-input {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--cyber-cyan);
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.filter-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-section-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.rarity-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 900px) {
+  .rarity-filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.rarity-filter-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-muted);
+  opacity: 0.5;
+  position: relative;
+}
+
+.rarity-filter-chip input {
+  display: none !important;
+}
+
+.rarity-filter-chip .chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #64748b;
+  transition: all 0.2s ease;
+}
+
+.rarity-filter-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  opacity: 0.85;
+}
+
+/* Checked / Active States with rich Gemstone colors */
+.rarity-filter-chip:has(input:checked),
+.rarity-filter-chip.active {
+  opacity: 1;
+}
+
+.rarity-filter-chip.chip-l:has(input:checked),
+.rarity-filter-chip.chip-l.active {
+  background: rgba(255, 225, 68, 0.14);
+  border-color: var(--gem-l);
+  color: var(--gem-l);
+  box-shadow: 0 0 12px rgba(255, 225, 68, 0.3);
+}
+.rarity-filter-chip.chip-l:has(input:checked) .chip-dot,
+.rarity-filter-chip.chip-l.active .chip-dot {
+  background: var(--gem-l);
+  box-shadow: 0 0 8px var(--gem-l-glow);
+}
+
+.rarity-filter-chip.chip-ur:has(input:checked),
+.rarity-filter-chip.chip-ur.active {
+  background: rgba(250, 153, 49, 0.14);
+  border-color: var(--gem-ur);
+  color: var(--gem-ur);
+  box-shadow: 0 0 12px rgba(250, 153, 49, 0.3);
+}
+.rarity-filter-chip.chip-ur:has(input:checked) .chip-dot,
+.rarity-filter-chip.chip-ur.active .chip-dot {
+  background: var(--gem-ur);
+  box-shadow: 0 0 8px var(--gem-ur-glow);
+}
+
+.rarity-filter-chip.chip-sr:has(input:checked),
+.rarity-filter-chip.chip-sr.active {
+  background: rgba(237, 111, 163, 0.14);
+  border-color: var(--gem-sr);
+  color: var(--gem-sr);
+  box-shadow: 0 0 12px rgba(237, 111, 163, 0.3);
+}
+.rarity-filter-chip.chip-sr:has(input:checked) .chip-dot,
+.rarity-filter-chip.chip-sr.active .chip-dot {
+  background: var(--gem-sr);
+  box-shadow: 0 0 8px var(--gem-sr-glow);
+}
+
+.rarity-filter-chip.chip-r:has(input:checked),
+.rarity-filter-chip.chip-r.active {
+  background: rgba(198, 167, 242, 0.14);
+  border-color: var(--gem-r);
+  color: var(--gem-r);
+  box-shadow: 0 0 12px rgba(198, 167, 242, 0.3);
+}
+.rarity-filter-chip.chip-r:has(input:checked) .chip-dot,
+.rarity-filter-chip.chip-r.active .chip-dot {
+  background: var(--gem-r);
+  box-shadow: 0 0 8px var(--gem-r-glow);
+}
+
+.rarity-filter-chip.chip-pc:has(input:checked),
+.rarity-filter-chip.chip-pc.active {
+  background: rgba(177, 207, 242, 0.14);
+  border-color: var(--gem-pc);
+  color: var(--gem-pc);
+  box-shadow: 0 0 12px rgba(177, 207, 242, 0.3);
+}
+.rarity-filter-chip.chip-pc:has(input:checked) .chip-dot,
+.rarity-filter-chip.chip-pc.active .chip-dot {
+  background: var(--gem-pc);
+  box-shadow: 0 0 8px var(--gem-pc-glow);
+}
+
+.rarity-filter-chip.chip-c:has(input:checked),
+.rarity-filter-chip.chip-c.active {
+  background: rgba(184, 242, 213, 0.14);
+  border-color: var(--gem-c);
+  color: var(--gem-c);
+  box-shadow: 0 0 12px rgba(184, 242, 213, 0.3);
+}
+.rarity-filter-chip.chip-c:has(input:checked) .chip-dot,
+.rarity-filter-chip.chip-c.active .chip-dot {
+  background: var(--gem-c);
+  box-shadow: 0 0 8px var(--gem-c-glow);
+}
+
+.price-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-with-currency {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.input-with-currency .form-input,
+.input-with-currency input {
+  padding-right: 32px;
+  width: 100%;
+}
+
+.currency-addon {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  font-size: 13px;
+  color: var(--cyber-amber);
+}
+
+.price-range-separator {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.rule-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 12.5px;
   text-align: center;
+  gap: 8px;
 }
 
 /* ============================================================================

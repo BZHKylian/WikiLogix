@@ -358,7 +358,7 @@
       </section>
 
       <!-- ==================================================================
-           ONGLET 4 : CONFIGURATION MIROIR (BOT & DISCORD)
+           ONGLET 4 : CONFIGURATION MIROIR (DISCORD & FILTRES)
            ================================================================== -->
       <section class="tab-pane" id="tab-config">
         <div class="config-grid">
@@ -390,169 +390,15 @@
             <div class="form-group">
               <label class="form-label" for="cfg-pause-thread-id">ID du Fil / Salon de Pause</label>
               <input type="text" id="cfg-pause-thread-id" class="form-input" placeholder="Ex: 987654321098765432">
-              <div class="form-hint">Fil Discord pour notifier les débuts et fins de cycles de repos</div>
+              <div class="form-hint">Fil Discord optionnel pour les notifications de statut</div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="cfg-target-cards">Cartes Prioritaires Ciblées (séparées par virgule)</label>
-              <input type="text" id="cfg-target-cards" class="form-input" placeholder="Adèle Castillon, Albert Einstein...">
-            </div>
-
-            <button class="btn btn-secondary" id="btn-test-discord-webhook" style="width: 100%;">
-              Tester le Webhook Discord
-            </button>
-          </div>
-
-          <!-- CARTE ROUTAGE MULTI-FILS DISCORD -->
-          <div class="config-card">
-            <div class="config-card-header">
-              <h3>Routage des Alertes par Fil Discord</h3>
-            </div>
-
-            <!-- ROUTAGE PAR RARETÉ -->
-            <div class="form-group">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="form-label" style="margin-bottom: 0;">Routage par Rareté (Thread ID)</span>
-                <label class="switch">
-                  <input type="checkbox" id="cfg-rarity-routing-toggle">
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="routing-threads-list" id="cfg-rarity-threads-group">
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: var(--gem-l-glow); color: var(--gem-l);">Légendaire</span>
-                  <input type="text" id="cfg-thread-l" class="form-input" placeholder="Thread ID Légendaires">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: var(--gem-ur-glow); color: var(--gem-ur);">Ultra Rare</span>
-                  <input type="text" id="cfg-thread-ur" class="form-input" placeholder="Thread ID Ultra Rares">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: var(--gem-sr-glow); color: var(--gem-sr);">Super Rare</span>
-                  <input type="text" id="cfg-thread-sr" class="form-input" placeholder="Thread ID Super Rares">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: var(--gem-r-glow); color: var(--gem-r);">Rare</span>
-                  <input type="text" id="cfg-thread-r" class="form-input" placeholder="Thread ID Rares">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: var(--gem-pc-glow); color: var(--gem-pc);">Peu Commune</span>
-                  <input type="text" id="cfg-thread-pc" class="form-input" placeholder="Thread ID Peu Communes">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: var(--gem-c-glow); color: var(--gem-c);">Commune</span>
-                  <input type="text" id="cfg-thread-c" class="form-input" placeholder="Thread ID Communes">
-                </div>
-              </div>
-            </div>
-
-            <!-- ROUTAGE PAR PALIERS DE PRIX -->
-            <div class="form-group" style="margin-top: 18px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="form-label" style="margin-bottom: 0;">Routage par Palier de Prix (Thread ID)</span>
-                <label class="switch">
-                  <input type="checkbox" id="cfg-price-routing-toggle">
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="routing-threads-list" id="cfg-price-threads-group">
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: rgba(255, 225, 68, 0.2); color: #ffe144;">+1000 🪙</span>
-                  <input type="text" id="cfg-thread-tier1000" class="form-input" placeholder="Thread ID +1000 🪙">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: rgba(250, 153, 49, 0.2); color: #fa9931;">250-1000 🪙</span>
-                  <input type="text" id="cfg-thread-tier250" class="form-input" placeholder="Thread ID 250-1000 🪙">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: rgba(237, 111, 163, 0.2); color: #ed6fa3;">100-250 🪙</span>
-                  <input type="text" id="cfg-thread-tier100" class="form-input" placeholder="Thread ID 100-250 🪙">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: rgba(198, 167, 242, 0.2); color: #c6a7f2;">50-100 🪙</span>
-                  <input type="text" id="cfg-thread-tier50" class="form-input" placeholder="Thread ID 50-100 🪙">
-                </div>
-                <div class="thread-row">
-                  <span class="thread-badge" style="background: rgba(177, 207, 242, 0.2); color: #b1cff2;">0-50 🪙</span>
-                  <input type="text" id="cfg-thread-tier0" class="form-input" placeholder="Thread ID 0-50 🪙">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARTE TEMPORISATIONS BOT & CYCLES HUMAINS -->
-          <div class="config-card">
-            <div class="config-card-header">
-              <h3>Temporisations & Cycles Humains du Bot</h3>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Délais de Clics Bot (millisecondes)</label>
-              <div class="form-row-2col">
-                <div>
-                  <input type="number" id="cfg-min-click-delay" class="form-input" placeholder="Min (ms)" value="1500">
-                  <div class="form-hint">Délai minimum</div>
-                </div>
-                <div>
-                  <input type="number" id="cfg-max-click-delay" class="form-input" placeholder="Max (ms)" value="2200">
-                  <div class="form-hint">Délai maximum</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Temporisations entre Boosters (secondes)</label>
-              <div class="form-row-2col">
-                <div>
-                  <input type="number" step="0.1" id="cfg-min-booster-wait" class="form-input" placeholder="Min (sec)" value="2.0">
-                  <div class="form-hint">Attente min</div>
-                </div>
-                <div>
-                  <input type="number" step="0.1" id="cfg-max-booster-wait" class="form-input" placeholder="Max (sec)" value="4.0">
-                  <div class="form-hint">Attente max</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 20px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="form-label" style="margin-bottom: 0;">Gestion des Cycles Humains (Farm & Pauses)</span>
-                <label class="switch">
-                  <input type="checkbox" id="cfg-human-cycles-toggle" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div id="cfg-human-cycles-settings">
-                <div class="form-row-2col" style="margin-bottom: 10px;">
-                  <div>
-                    <label class="form-label">Temps Actif Min (min)</label>
-                    <input type="number" id="cfg-min-active-min" class="form-input" value="35">
-                  </div>
-                  <div>
-                    <label class="form-label">Temps Actif Max (min)</label>
-                    <input type="number" id="cfg-max-active-min" class="form-input" value="50">
-                  </div>
-                </div>
-
-                <div class="form-row-2col">
-                  <div>
-                    <label class="form-label">Pause Min (min)</label>
-                    <input type="number" id="cfg-min-break-min" class="form-input" value="10">
-                  </div>
-                  <div>
-                    <label class="form-label">Pause Max (min)</label>
-                    <input type="number" id="cfg-max-break-min" class="form-input" value="25">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 24px;">
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button class="btn btn-secondary" id="btn-test-discord-webhook" style="flex: 1;">
+                Tester le Webhook
+              </button>
               <button class="btn btn-primary" id="btn-save-discord-config" style="flex: 1;">
-                Enregistrer la Configuration
+                Enregistrer
               </button>
             </div>
           </div>
@@ -560,14 +406,17 @@
           <!-- ACTIONS DE GESTION DES DONNÉES -->
           <div class="config-card">
             <div class="config-card-header">
-              <h3>Sauvegarde & Actions Globales</h3>
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
+                Sauvegarde & Actions Globales
+              </h3>
             </div>
 
-            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">
-              Exportez ou réinitialisez l'intégralité des données en mémoire locale du dashboard.
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;">
+              Exportez vos statistiques et votre configuration au format JSON, ou réinitialisez la base de données locale du dashboard.
             </p>
 
-            <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
               <button class="btn btn-secondary" id="btn-export-data">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 Exporter les Données en JSON
@@ -575,8 +424,40 @@
 
               <button class="btn btn-danger" id="btn-reset-data">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                Réinitialiser les Statistiques & Tirages
+                Réinitialiser les Statistiques
               </button>
+            </div>
+          </div>
+
+          <!-- CARTE GESTIONNAIRE DE FILTRES DYNAMIQUES & ROUTAGE MULTI-FILS DISCORD (Pleine Largeur) -->
+          <div class="config-card config-card-full">
+            <div class="config-card-header">
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filtres Personnalisés & Routage par Fil (Threads)
+              </h3>
+            </div>
+
+            <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">
+              Créez des règles de filtrage sur-mesure pour router automatiquement vos tirages vers des <strong>fils Discord spécifiques (threads)</strong> selon la rareté et les seuils de prix.
+            </p>
+
+            <div class="rules-header-row">
+              <div class="rules-header-title">
+                <h4>Mes Règles de Filtrage</h4>
+                <span class="rules-count-badge" id="discord-rules-count">0 règle</span>
+              </div>
+              <button type="button" id="btn-add-discord-rule" class="btn-add-rule" title="Créer une nouvelle règle personnalisée">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Ajouter un Filtre</span>
+              </button>
+            </div>
+
+            <div class="discord-rules-container" id="discord-rules-list">
+              <!-- Les cartes de filtres dynamiques sont injectées ici par app.js -->
             </div>
           </div>
         </div>

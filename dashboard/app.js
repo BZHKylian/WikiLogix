@@ -2,6 +2,7 @@
  * WikiMasters Web Dashboard - Contrôleur Principal Autonome & Moteur Graphique
  * Thème : Deep Cyber & Gemstones
  * 100% Fonctionnel - Zéro dépendance externe - Compatible file:// et http://
+ * Architecture miroir avec l'extension WikiMasters (Système de Filtres Dynamiques & externally_connectable)
  */
 
 (function () {
@@ -21,7 +22,8 @@
       textColor: '#0d1117',
       bgColor: 'rgba(255, 225, 68, 0.15)',
       borderColor: '#ffe144',
-      glowColor: 'rgba(255, 225, 68, 0.45)'
+      glowColor: 'rgba(255, 225, 68, 0.45)',
+      numericRarity: 6
     },
     UR: {
       id: 'UR',
@@ -32,7 +34,8 @@
       textColor: '#ffffff',
       bgColor: 'rgba(250, 153, 49, 0.15)',
       borderColor: '#fa9931',
-      glowColor: 'rgba(250, 153, 49, 0.45)'
+      glowColor: 'rgba(250, 153, 49, 0.45)',
+      numericRarity: 5
     },
     SR: {
       id: 'SR',
@@ -43,7 +46,8 @@
       textColor: '#ffffff',
       bgColor: 'rgba(237, 111, 163, 0.15)',
       borderColor: '#ed6fa3',
-      glowColor: 'rgba(237, 111, 163, 0.45)'
+      glowColor: 'rgba(237, 111, 163, 0.45)',
+      numericRarity: 4
     },
     R: {
       id: 'R',
@@ -54,7 +58,8 @@
       textColor: '#0d1117',
       bgColor: 'rgba(198, 167, 242, 0.15)',
       borderColor: '#c6a7f2',
-      glowColor: 'rgba(198, 167, 242, 0.45)'
+      glowColor: 'rgba(198, 167, 242, 0.45)',
+      numericRarity: 3
     },
     PC: {
       id: 'PC',
@@ -65,7 +70,8 @@
       textColor: '#0d1117',
       bgColor: 'rgba(177, 207, 242, 0.15)',
       borderColor: '#b1cff2',
-      glowColor: 'rgba(177, 207, 242, 0.45)'
+      glowColor: 'rgba(177, 207, 242, 0.45)',
+      numericRarity: 2
     },
     C: {
       id: 'C',
@@ -76,7 +82,8 @@
       textColor: '#0d1117',
       bgColor: 'rgba(184, 242, 213, 0.15)',
       borderColor: '#b8f2d5',
-      glowColor: 'rgba(184, 242, 213, 0.45)'
+      glowColor: 'rgba(184, 242, 213, 0.45)',
+      numericRarity: 1
     }
   };
 
@@ -298,7 +305,7 @@
       avgPrice: 140,
       minPrice: 110,
       maxPrice: 175,
-      lastPrice: 135,
+      lastPrice: 145,
       sellPriceMin: 70,
       sellPriceMax: 105,
       sellPriceMid: 88,
@@ -310,20 +317,20 @@
       id: 'card_demo_10',
       boosterId: 'booster_demo_02',
       sessionId: 'session_demo_02',
-      name: 'Colisée',
+      name: 'Océan Pacifique',
       rarity: 'PC',
       rarityLabel: 'Peu Commune',
       rarityShortCode: 'PC',
       rarityColor: '#b1cff2',
       cardIndex: 1,
       totalInBooster: 5,
-      description: 'Amphithéâtre flavien situé au centre de Rome, chef-d\'œuvre monumental de l\'ingénierie impériale romaine.',
+      description: 'Plus vaste océan du monde s\'étendant sur une superficie de plus de 165 millions de kilomètres carrés.',
       attack: 48,
       defense: 72,
       avgPrice: 45,
       minPrice: 35,
       maxPrice: 60,
-      lastPrice: 40,
+      lastPrice: 42,
       sellPriceMin: 23,
       sellPriceMax: 34,
       sellPriceMid: 28,
@@ -335,24 +342,24 @@
       id: 'card_demo_11',
       boosterId: 'booster_demo_03',
       sessionId: 'session_demo_03',
-      name: 'Jeanne d\'Arc',
-      rarity: 'SR',
-      rarityLabel: 'Super Rare',
-      rarityShortCode: 'SR',
-      rarityColor: '#ed6fa3',
+      name: 'Trou Noir Gargantua',
+      rarity: 'L',
+      rarityLabel: 'Légendaire',
+      rarityShortCode: 'L',
+      rarityColor: '#ffe144',
       cardIndex: 5,
       totalInBooster: 5,
-      description: 'Héroïne de l\'histoire de France, cheffe de guerre et sainte patronne ayant mené les troupes royales durant la guerre de Cent Ans.',
-      attack: 86,
-      defense: 80,
-      avgPrice: 560,
-      minPrice: 490,
-      maxPrice: 680,
-      lastPrice: 570,
-      sellPriceMin: 280,
-      sellPriceMax: 420,
-      sellPriceMid: 350,
-      salesCount: 38,
+      description: 'Objet céleste supermassif dont le champ gravitationnel est si intense qu\'aucune matière ni rayonnement ne peut s\'en échapper.',
+      attack: 99,
+      defense: 99,
+      avgPrice: 4800,
+      minPrice: 4200,
+      maxPrice: 5500,
+      lastPrice: 4900,
+      sellPriceMin: 2400,
+      sellPriceMax: 3600,
+      sellPriceMid: 3000,
+      salesCount: 4,
       hasRealMarketPrice: true,
       timestamp: Date.now() - 1000 * 60 * 95
     },
@@ -360,24 +367,24 @@
       id: 'card_demo_12',
       boosterId: 'booster_demo_03',
       sessionId: 'session_demo_03',
-      name: 'Mona Lisa',
-      rarity: 'UR',
-      rarityLabel: 'Ultra Rare',
-      rarityShortCode: 'UR',
-      rarityColor: '#fa9931',
+      name: 'Galilée',
+      rarity: 'SR',
+      rarityLabel: 'Super Rare',
+      rarityShortCode: 'SR',
+      rarityColor: '#ed6fa3',
       cardIndex: 4,
       totalInBooster: 5,
-      description: 'Portrait de Lisa Gherardini peint par Léonard de Vinci, œuvre d\'art la plus célèbre, la plus visitée et la plus parodiée au monde.',
-      attack: 60,
-      defense: 94,
-      avgPrice: 1250,
-      minPrice: 1050,
-      maxPrice: 1500,
-      lastPrice: 1300,
-      sellPriceMin: 625,
-      sellPriceMax: 938,
-      sellPriceMid: 781,
-      salesCount: 16,
+      description: 'Astronome, mathématicien et physicien florentin du XVIIe siècle, pionnier de la méthode scientifique expérimentale.',
+      attack: 76,
+      defense: 83,
+      avgPrice: 350,
+      minPrice: 290,
+      maxPrice: 410,
+      lastPrice: 360,
+      sellPriceMin: 175,
+      sellPriceMax: 263,
+      sellPriceMid: 219,
+      salesCount: 38,
       hasRealMarketPrice: true,
       timestamp: Date.now() - 1000 * 60 * 94
     },
@@ -385,16 +392,16 @@
       id: 'card_demo_13',
       boosterId: 'booster_demo_03',
       sessionId: 'session_demo_03',
-      name: 'Victor Hugo',
+      name: 'Colisée de Rome',
       rarity: 'R',
       rarityLabel: 'Rare',
       rarityShortCode: 'R',
       rarityColor: '#c6a7f2',
       cardIndex: 3,
       totalInBooster: 5,
-      description: 'Poète, dramaturge, écrivain et romancier du romantisme français, auteur des Misérables et de Notre-Dame de Paris.',
-      attack: 70,
-      defense: 75,
+      description: 'Gigantesque amphithéâtre flavien situé au centre de la ville de Rome, pouvant accueillir jusqu\'à 50 000 spectateurs.',
+      attack: 60,
+      defense: 87,
       avgPrice: 160,
       minPrice: 130,
       maxPrice: 200,
@@ -510,24 +517,24 @@
       id: 'card_demo_18',
       boosterId: 'booster_demo_04',
       sessionId: 'session_demo_04',
-      name: 'Galilée',
-      rarity: 'PC',
-      rarityLabel: 'Peu Commune',
-      rarityShortCode: 'PC',
-      rarityColor: '#b1cff2',
+      name: 'Wolfgang Amadeus Mozart',
+      rarity: 'UR',
+      rarityLabel: 'Ultra Rare',
+      rarityShortCode: 'UR',
+      rarityColor: '#fa9931',
       cardIndex: 3,
       totalInBooster: 5,
-      description: 'Astronome et physicien toscan, pionnier de la méthode scientifique moderne et défenseur de l\'héliocentrisme.',
-      attack: 52,
-      defense: 65,
-      avgPrice: 50,
-      minPrice: 40,
-      maxPrice: 65,
-      lastPrice: 48,
-      sellPriceMin: 25,
-      sellPriceMax: 38,
-      sellPriceMid: 31,
-      salesCount: 95,
+      description: 'Compositeur autrichien virtuose de la période classique, auteur de chefs-d\'œuvre universels d\'opéra et de symphonie.',
+      attack: 87,
+      defense: 81,
+      avgPrice: 940,
+      minPrice: 800,
+      maxPrice: 1100,
+      lastPrice: 960,
+      sellPriceMin: 470,
+      sellPriceMax: 705,
+      sellPriceMid: 588,
+      salesCount: 25,
       hasRealMarketPrice: true,
       timestamp: Date.now() - 1000 * 60 * 48
     },
@@ -535,24 +542,24 @@
       id: 'card_demo_19',
       boosterId: 'booster_demo_04',
       sessionId: 'session_demo_04',
-      name: 'Château de Versailles',
-      rarity: 'C',
-      rarityLabel: 'Commune',
-      rarityShortCode: 'C',
-      rarityColor: '#b8f2d5',
+      name: 'Vulcain (Dieu du Feu)',
+      rarity: 'PC',
+      rarityLabel: 'Peu Commune',
+      rarityShortCode: 'PC',
+      rarityColor: '#b1cff2',
       cardIndex: 2,
       totalInBooster: 5,
-      description: 'Monument historique somptueux, résidence officielle des rois de France Louis XIV, Louis XV et Louis XVI.',
-      attack: 38,
-      defense: 60,
-      avgPrice: 18,
-      minPrice: 12,
-      maxPrice: 25,
-      lastPrice: 16,
-      sellPriceMin: 9,
-      sellPriceMax: 14,
-      sellPriceMid: 11,
-      salesCount: 220,
+      description: 'Dieu romain du feu, des volcans, de la forge et du travail des métaux.',
+      attack: 56,
+      defense: 62,
+      avgPrice: 38,
+      minPrice: 28,
+      maxPrice: 50,
+      lastPrice: 35,
+      sellPriceMin: 19,
+      sellPriceMax: 29,
+      sellPriceMid: 24,
+      salesCount: 125,
       hasRealMarketPrice: true,
       timestamp: Date.now() - 1000 * 60 * 47
     },
@@ -560,24 +567,24 @@
       id: 'card_demo_20',
       boosterId: 'booster_demo_04',
       sessionId: 'session_demo_04',
-      name: 'Volcan Vésuve',
+      name: 'Constellation de Cassiopée',
       rarity: 'C',
       rarityLabel: 'Commune',
       rarityShortCode: 'C',
       rarityColor: '#b8f2d5',
       cardIndex: 1,
       totalInBooster: 5,
-      description: 'Sommet volcanique bordant la baie de Naples, tristement célèbre pour son éruption dévastatrice ayant enseveli Pompéi en 79.',
-      attack: 45,
-      defense: 40,
-      avgPrice: 14,
-      minPrice: 10,
-      maxPrice: 20,
-      lastPrice: 15,
-      sellPriceMin: 7,
-      sellPriceMax: 11,
-      sellPriceMid: 9,
-      salesCount: 260,
+      description: 'Constellation circumpolaire de l\'hémisphère nord, reconnaissable à sa forme caractéristique de W dans le ciel étoilé.',
+      attack: 38,
+      defense: 45,
+      avgPrice: 18,
+      minPrice: 12,
+      maxPrice: 25,
+      lastPrice: 19,
+      sellPriceMin: 9,
+      sellPriceMax: 14,
+      sellPriceMid: 11,
+      salesCount: 210,
       hasRealMarketPrice: true,
       timestamp: Date.now() - 1000 * 60 * 46
     },
@@ -585,18 +592,18 @@
       id: 'card_demo_21',
       boosterId: 'booster_demo_05',
       sessionId: 'session_demo_05',
-      name: 'Trou Noir Gargantua',
+      name: 'Jeanne d\'Arc',
       rarity: 'L',
       rarityLabel: 'Légendaire',
       rarityShortCode: 'L',
       rarityColor: '#ffe144',
       cardIndex: 5,
       totalInBooster: 5,
-      description: 'Objet céleste d\'une densité infinie dont le champ de gravitation empêche toute matière ou rayonnement électromagnétique de s\'échapper.',
-      attack: 99,
-      defense: 98,
+      description: 'Héroïne nationale française et sainte de l\'Église catholique, figure majeure de la guerre de Cent Ans et du siège d\'Orléans.',
+      attack: 97,
+      defense: 94,
       avgPrice: 4200,
-      minPrice: 3900,
+      minPrice: 3700,
       maxPrice: 4900,
       lastPrice: 4350,
       sellPriceMin: 2100,
@@ -713,33 +720,41 @@
     webhookUrl: '',
     discordUserId: '',
     pauseThreadId: '',
-    targetCardsList: ['Adèle Castillon', 'Trou Noir Gargantua', 'Léonard de Vinci'],
-    rarityRoutingEnabled: true,
-    priceRoutingEnabled: true,
-    rarityThreads: {
-      L: '',
-      UR: '',
-      SR: '',
-      R: '',
-      PC: '',
-      C: ''
-    },
-    priceThreads: {
-      tier1000: '',
-      tier250: '',
-      tier100: '',
-      tier50: '',
-      tier0: ''
-    },
-    minClickDelay: 1500,
-    maxClickDelay: 2200,
-    minBoosterWaitSec: 2.0,
-    maxBoosterWaitSec: 4.0,
-    humanCyclesEnabled: true,
-    minActiveMin: 35,
-    maxActiveMin: 50,
-    minBreakMin: 10,
-    maxBreakMin: 25
+    rules: [
+      {
+        id: 'rule_default_1',
+        name: 'Légendaires & Ultra Rares',
+        enabled: true,
+        threadId: '',
+        customWebhookUrl: '',
+        rarities: { L: true, UR: true, SR: false, R: false, PC: false, C: false },
+        minPrice: 0,
+        maxPrice: null,
+        pingUserId: ''
+      },
+      {
+        id: 'rule_default_2',
+        name: 'Super Rares & Drops Spéciaux',
+        enabled: true,
+        threadId: '',
+        customWebhookUrl: '',
+        rarities: { L: false, UR: false, SR: true, R: false, PC: false, C: false },
+        minPrice: 0,
+        maxPrice: null,
+        pingUserId: ''
+      },
+      {
+        id: 'rule_default_3',
+        name: 'Cartes Chères (+500 🪙)',
+        enabled: true,
+        threadId: '',
+        customWebhookUrl: '',
+        rarities: { L: true, UR: true, SR: true, R: true, PC: true, C: true },
+        minPrice: 500,
+        maxPrice: null,
+        pingUserId: ''
+      }
+    ]
   };
 
   const SIMULATION_CARD_POOL = [
@@ -950,30 +965,23 @@
         </div>
         <div class="chart-tooltip-body">
           <div class="tooltip-row">
-            <span>Valeur Carte :</span>
-            <strong>+${pt.cardPrice.toLocaleString('fr-FR')} 🪙</strong>
+            <span>Prix Carte :</span>
+            <span class="tooltip-val" style="color: ${pt.rarityColor}">+${pt.cardPrice.toLocaleString('fr-FR')} 🪙</span>
           </div>
-          <div class="tooltip-row highlight">
+          <div class="tooltip-row">
             <span>Cumul Total :</span>
-            <strong>${pt.cumulativeValue.toLocaleString('fr-FR')} 🪙</strong>
+            <span class="tooltip-val" style="color: var(--cyber-cyan); font-weight: 700;">${pt.cumulativeValue.toLocaleString('fr-FR')} 🪙</span>
           </div>
-          <div class="tooltip-row footer">
-            <span>Tirage #${pt.index}</span>
-            <span class="time">${dateStr}</span>
+          <div class="tooltip-row" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+            <span>Tirée à :</span>
+            <span>${dateStr}</span>
           </div>
         </div>
       `;
 
+      this.tooltip.style.left = `${posX}px`;
+      this.tooltip.style.top = `30px`;
       this.tooltip.style.opacity = '1';
-      const tooltipWidth = this.tooltip.offsetWidth || 190;
-      let leftPos = posX;
-      if (leftPos + tooltipWidth > rect.width - 20) {
-        leftPos = posX - tooltipWidth - 10;
-      } else {
-        leftPos = posX + 15;
-      }
-      this.tooltip.style.left = leftPos + 'px';
-      this.tooltip.style.top = '30px';
     }
 
     render(progress = 1) {
@@ -988,9 +996,9 @@
 
       if (this.dataPoints.length === 0) {
         ctx.fillStyle = '#64748b';
-        ctx.font = '14px "Inter", sans-serif';
+        ctx.font = '13px "Inter", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Aucune donnée de tirage disponible', width / 2, height / 2);
+        ctx.fillText('Aucune donnée de gains disponible', width / 2, height / 2);
         return;
       }
 
@@ -1542,10 +1550,16 @@
     const savedConfig = localStorage.getItem('wm_cached_discord_config');
     if (savedConfig) {
       try {
-        state.discordConfig = { ...DEFAULT_DISCORD_CONFIG, ...JSON.parse(savedConfig) };
+        const parsed = JSON.parse(savedConfig);
+        state.discordConfig = { ...DEFAULT_DISCORD_CONFIG, ...parsed };
+        if (!Array.isArray(state.discordConfig.rules) || state.discordConfig.rules.length === 0) {
+          state.discordConfig.rules = [...DEFAULT_DISCORD_CONFIG.rules];
+        }
       } catch (_) {
         state.discordConfig = { ...DEFAULT_DISCORD_CONFIG };
       }
+    } else {
+      state.discordConfig = { ...DEFAULT_DISCORD_CONFIG };
     }
 
     const savedExtId = localStorage.getItem('wm_extension_id');
@@ -2059,6 +2073,9 @@
     }
     if (data.discordConfig) {
       state.discordConfig = { ...state.discordConfig, ...data.discordConfig };
+      if (Array.isArray(data.discordConfig.rules)) {
+        state.discordConfig.rules = data.discordConfig.rules;
+      }
       populateDiscordConfigForm();
     }
 
@@ -2104,68 +2121,354 @@
   }
 
   // ==========================================================================
-  // 10. SIMULATION EN DIRECT (FONCTIONNEMENT AUTONOME IMMÉDIAT)
+  // 10. CRÉATEUR DE FILTRES PERSONNALISÉS DYNAMIQUES & DISCORD ROUTING
   // ==========================================================================
 
-  function toggleSimulationMode(enable) {
-    state.isSimulationMode = enable;
+  let discordSaveDebounceTimeout = null;
 
-    if (enable) {
-      setConnectionStatus('simulation');
-      logBridgeMessage('Démarrage du flux de simulation en temps réel...', 'info');
-      showToast('Simulation en direct activée : tirages générés en temps réel.', 'info');
+  function debouncedSaveAndSyncDiscordConfig(showNotification = false, delayMs = 500) {
+    if (discordSaveDebounceTimeout) {
+      clearTimeout(discordSaveDebounceTimeout);
+    }
+    discordSaveDebounceTimeout = setTimeout(() => {
+      saveAndSyncDiscordConfig(showNotification);
+    }, delayMs);
+  }
 
-      let simCardCounter = state.cards.length + 1;
-      state.simulationInterval = setInterval(() => {
-        const newCard = generateRandomSimulationCard(simCardCounter++);
-        state.cards.push(newCard);
-        updateDashboardData();
-        logBridgeMessage(`Tirage simulé : [${newCard.rarity}] ${newCard.name} (+${newCard.avgPrice} 🪙)`, 'success');
+  function saveAndSyncDiscordConfig(showNotification = true) {
+    persistData();
+    if (showNotification) {
+      showToast('Configuration enregistrée !', 'success');
+      logBridgeMessage('Paramètres Discord & Filtres sauvegardés en local.', 'success');
+    }
 
-        if (newCard.rarity === 'L' || newCard.rarity === 'UR') {
-          showToast(`🌟 Drop Majeur ! [${newCard.rarity}] ${newCard.name} (${newCard.avgPrice} 🪙)`, 'success');
-        }
-      }, 3500);
-    } else {
-      if (state.simulationInterval) clearInterval(state.simulationInterval);
-      state.simulationInterval = null;
-      setConnectionStatus('disconnected');
-      logBridgeMessage('Flux de simulation arrêté.', 'warn');
-      showToast('Simulation en direct désactivée.', 'info');
+    if (state.extensionId && window.chrome?.runtime?.sendMessage) {
+      try {
+        window.chrome.runtime.sendMessage(
+          state.extensionId,
+          { action: 'saveWikiMastersConfig', config: state.discordConfig },
+          (resp) => {
+            if (!window.chrome.runtime.lastError && resp?.success) {
+              logBridgeMessage('Configuration synchronisée avec le Service Worker !', 'success');
+            }
+          }
+        );
+      } catch (err) {
+        console.warn('[WikiMasters Dashboard] Erreur sync sendMessage :', err);
+      }
     }
   }
 
+  const RARITY_DEFINITIONS = [
+    { code: 'L', label: '[L] Légendaire' },
+    { code: 'UR', label: '[UR] Ultra Rare' },
+    { code: 'SR', label: '[SR] Super Rare' },
+    { code: 'R', label: '[R] Rare' },
+    { code: 'PC', label: '[PC] Peu Commune' },
+    { code: 'C', label: '[C] Commune' }
+  ];
+
+  function renderDiscordRules() {
+    const container = document.getElementById('discord-rules-list');
+    const countBadge = document.getElementById('discord-rules-count');
+    if (!container) return;
+
+    const rules = state.discordConfig.rules || [];
+    if (countBadge) {
+      countBadge.textContent = `${rules.length} règle${rules.length > 1 ? 's' : ''}`;
+    }
+
+    container.innerHTML = '';
+
+    if (rules.length === 0) {
+      container.innerHTML = `
+        <div class="rule-empty-state">
+          <span style="font-weight: 600; color: #ffffff;">Aucun filtre configuré.</span>
+          <span>Cliquez sur <strong>+ Ajouter un Filtre</strong> pour créer une règle avec routage par fil Discord spécifique.</span>
+        </div>
+      `;
+      return;
+    }
+
+    rules.forEach((rule, index) => {
+      const card = document.createElement('div');
+      card.className = `discord-rule-card ${rule.enabled === false ? 'rule-disabled' : ''}`;
+      card.setAttribute('data-rule-id', rule.id);
+
+      const raritiesHtml = RARITY_DEFINITIONS.map(r => {
+        const isChecked = rule.rarities ? Boolean(rule.rarities[r.code]) : true;
+        return `
+          <label class="rarity-filter-chip chip-${r.code.toLowerCase()} ${isChecked ? 'active' : ''}" title="${r.label}">
+            <input type="checkbox" class="rule-rarity-checkbox" data-rule-id="${rule.id}" data-rarity="${r.code}" ${isChecked ? 'checked' : ''}>
+            <span class="chip-dot"></span>
+            <span class="chip-label">${r.label}</span>
+          </label>
+        `;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="rule-header-actions">
+          <input type="text" class="rule-name-input form-input" data-rule-id="${rule.id}" value="${rule.name || `Filtre #${index + 1}`}" placeholder="Nom du filtre / fil">
+          <div class="rule-actions-group">
+            <label class="switch" title="Activer ou désactiver ce filtre" style="transform: scale(0.85); margin-right: 2px;">
+              <input type="checkbox" class="rule-enable-toggle" data-rule-id="${rule.id}" ${rule.enabled !== false ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+            <button type="button" class="btn-test-rule" data-rule-id="${rule.id}" title="Tester ce fil">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              <span>Tester</span>
+            </button>
+            <button type="button" class="btn-delete-rule" data-rule-id="${rule.id}" title="Supprimer ce filtre">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="rule-thread-row">
+          <label>ID du Fil Discord (Thread ID)</label>
+          <input type="text" class="form-input rule-thread-input" data-rule-id="${rule.id}" value="${rule.threadId || ''}" placeholder="Ex: 119482938491823901 (Optionnel si salon principal)">
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-section-header">
+            <span class="filter-section-title">Raretés ciblées</span>
+          </div>
+          <div class="rarity-filter-grid">
+            ${raritiesHtml}
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-section-header">
+            <span class="filter-section-title">Fourchette de Prix Réel (🪙)</span>
+            <span class="filter-section-sub">Laissez Max vide pour l'infini (∞)</span>
+          </div>
+          <div class="price-range-inputs">
+            <div class="input-with-currency">
+              <input type="number" class="form-input rule-min-price-input" data-rule-id="${rule.id}" min="0" step="10" value="${rule.minPrice > 0 ? rule.minPrice : ''}" placeholder="Min (0)">
+              <span class="currency-addon">🪙</span>
+            </div>
+            <span class="price-range-separator">à</span>
+            <div class="input-with-currency">
+              <input type="number" class="form-input rule-max-price-input" data-rule-id="${rule.id}" min="0" step="10" value="${(rule.maxPrice !== null && rule.maxPrice !== undefined && rule.maxPrice !== '') ? rule.maxPrice : ''}" placeholder="Max (∞)">
+              <span class="currency-addon">🪙</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  function initDiscordRulesHandlers() {
+    const btnAddRule = document.getElementById('btn-add-discord-rule');
+    const container = document.getElementById('discord-rules-list');
+
+    if (btnAddRule) {
+      btnAddRule.addEventListener('click', () => {
+        const nextIndex = (state.discordConfig.rules || []).length + 1;
+        const newRule = {
+          id: `rule_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: `Filtre #${nextIndex}`,
+          enabled: true,
+          threadId: '',
+          customWebhookUrl: '',
+          rarities: { L: true, UR: true, SR: false, R: false, PC: false, C: false },
+          minPrice: 0,
+          maxPrice: null,
+          pingUserId: ''
+        };
+        if (!Array.isArray(state.discordConfig.rules)) state.discordConfig.rules = [];
+        state.discordConfig.rules.push(newRule);
+        renderDiscordRules();
+        debouncedSaveAndSyncDiscordConfig(false, 200);
+        showToast(`Filtre #${nextIndex} ajouté !`, 'success');
+      });
+    }
+
+    if (container) {
+      // Saisie texte sans recréer le DOM
+      container.addEventListener('input', (e) => {
+        const target = e.target;
+        const ruleId = target.getAttribute('data-rule-id');
+        if (!ruleId) return;
+
+        const rule = (state.discordConfig.rules || []).find((r) => r.id === ruleId);
+        if (!rule) return;
+
+        if (target.classList.contains('rule-name-input')) {
+          rule.name = target.value;
+        } else if (target.classList.contains('rule-thread-input')) {
+          rule.threadId = target.value.trim();
+        } else if (target.classList.contains('rule-min-price-input')) {
+          rule.minPrice = target.value ? Math.max(0, Number(target.value)) : 0;
+        } else if (target.classList.contains('rule-max-price-input')) {
+          rule.maxPrice = (target.value && target.value.trim() !== '') ? Math.max(0, Number(target.value)) : null;
+        }
+
+        debouncedSaveAndSyncDiscordConfig(false);
+      });
+
+      // Cases à cocher et switches
+      container.addEventListener('change', (e) => {
+        const target = e.target;
+        const ruleId = target.getAttribute('data-rule-id');
+        if (!ruleId) return;
+
+        const rule = (state.discordConfig.rules || []).find((r) => r.id === ruleId);
+        if (!rule) return;
+
+        if (target.classList.contains('rule-enable-toggle')) {
+          rule.enabled = target.checked;
+          const card = container.querySelector(`.discord-rule-card[data-rule-id="${ruleId}"]`);
+          if (card) {
+            card.classList.toggle('rule-disabled', !rule.enabled);
+          }
+        } else if (target.classList.contains('rule-rarity-checkbox')) {
+          const rarity = target.getAttribute('data-rarity');
+          if (!rule.rarities) rule.rarities = {};
+          rule.rarities[rarity] = target.checked;
+          const chipLabel = target.closest('.rarity-filter-chip');
+          if (chipLabel) {
+            chipLabel.classList.toggle('active', target.checked);
+          }
+        }
+
+        debouncedSaveAndSyncDiscordConfig(false, 300);
+      });
+
+      // Boutons Tester et Supprimer
+      container.addEventListener('click', async (e) => {
+        const btnDelete = e.target.closest('.btn-delete-rule');
+        const btnTest = e.target.closest('.btn-test-rule');
+
+        if (btnDelete) {
+          const ruleId = btnDelete.getAttribute('data-rule-id');
+          const rule = (state.discordConfig.rules || []).find((r) => r.id === ruleId);
+          const confirmDelete = window.confirm(`Supprimer le filtre "${rule?.name || 'ce filtre'}" ?`);
+          if (confirmDelete) {
+            state.discordConfig.rules = state.discordConfig.rules.filter((r) => r.id !== ruleId);
+            renderDiscordRules();
+            saveAndSyncDiscordConfig(false);
+            showToast('Filtre supprimé.', 'info');
+          }
+          return;
+        }
+
+        if (btnTest) {
+          const ruleId = btnTest.getAttribute('data-rule-id');
+          const rule = (state.discordConfig.rules || []).find((r) => r.id === ruleId);
+          if (!rule) return;
+
+          const webhookUrl = (rule.customWebhookUrl || state.discordConfig.webhookUrl || getInputValue('cfg-webhook-url') || '').trim();
+          const pingUser = (rule.pingUserId || state.discordConfig.discordUserId || getInputValue('cfg-discord-user-id') || '').trim();
+
+          if (!webhookUrl) {
+            showToast('Veuillez renseigner une URL de Webhook Discord valide', 'danger');
+            const mainInput = document.getElementById('cfg-webhook-url');
+            if (mainInput) mainInput.focus();
+            return;
+          }
+
+          const origHtml = btnTest.innerHTML;
+          btnTest.disabled = true;
+          btnTest.style.opacity = '0.7';
+          btnTest.innerHTML = `<span>...</span>`;
+
+          try {
+            saveAndSyncDiscordConfig(false);
+
+            let urlWithThread = webhookUrl;
+            if (rule.threadId) {
+              const delim = webhookUrl.includes('?') ? '&' : '?';
+              urlWithThread = `${webhookUrl}${delim}thread_id=${rule.threadId.trim()}`;
+            }
+
+            const activeRarities = Object.keys(rule.rarities || {}).filter(k => rule.rarities[k]).join(', ') || 'Toutes';
+            const priceDesc = rule.maxPrice ? `${rule.minPrice || 0} à ${rule.maxPrice} 🪙` : `≥ ${rule.minPrice || 0} 🪙`;
+
+            const payload = {
+              username: 'WikiMasters Alert Hub',
+              avatar_url: 'https://i.imgur.com/MUpcyUn.jpeg',
+              content: pingUser ? `<@${pingUser}>` : undefined,
+              embeds: [
+                {
+                  title: `🎯 Test de Filtre : ${rule.name || 'Filtre Sur-Mesure'}`,
+                  description: `Ce message confirme le bon routage vers ce fil Discord dédié avec vos critères de drop personnalisés.`,
+                  color: 0x06b6d4,
+                  fields: [
+                    { name: 'Fil / Thread ID', value: rule.threadId ? `\`${rule.threadId}\`` : '*Salon Principal*', inline: true },
+                    { name: 'Raretés Ciblées', value: activeRarities, inline: true },
+                    { name: 'Fourchette Prix', value: priceDesc, inline: true },
+                    { name: 'Statut Règle', value: rule.enabled !== false ? '✅ Active' : '⏸️ Désactivée', inline: true }
+                  ],
+                  footer: { text: 'WikiMasters Dynamic Rule Engine • Dashboard Pro' },
+                  timestamp: new Date().toISOString()
+                }
+              ]
+            };
+
+            const response = await fetch(urlWithThread, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+              showToast(`Test envoyé avec succès pour "${rule.name}" !`, 'success');
+              logBridgeMessage(`Test Filtre "${rule.name}" : Succès (HTTP ${response.status})`, 'success');
+            } else {
+              showToast(`Échec du test (${rule.name}) : HTTP ${response.status}`, 'danger');
+              logBridgeMessage(`Test Filtre "${rule.name}" : Échec HTTP ${response.status}`, 'error');
+            }
+          } catch (err) {
+            showToast(`Erreur réseau : ${err.message}`, 'danger');
+            logBridgeMessage(`Test Filtre Exception : ${err.message}`, 'error');
+          } finally {
+            btnTest.disabled = false;
+            btnTest.style.opacity = '1';
+            btnTest.innerHTML = origHtml;
+          }
+        }
+      });
+    }
+  }
+
+  function findMatchingRules(card, rules) {
+    if (!Array.isArray(rules)) return [];
+    const price = Number(card.avgPrice || card.suggestedPrice || 0);
+
+    return rules.filter((rule) => {
+      if (rule.enabled === false) return false;
+
+      // Filtrage par rareté
+      if (rule.rarities && typeof rule.rarities === 'object') {
+        const isAllowed = Boolean(rule.rarities[card.rarity]);
+        if (!isAllowed) return false;
+      }
+
+      // Filtrage par prix minimum
+      if (typeof rule.minPrice === 'number' && rule.minPrice > 0) {
+        if (price < rule.minPrice) return false;
+      }
+
+      // Filtrage par prix maximum
+      if (typeof rule.maxPrice === 'number' && rule.maxPrice > 0) {
+        if (price > rule.maxPrice) return false;
+      }
+
+      return true;
+    });
+  }
+
   // ==========================================================================
-  // 11. CONFIGURATION DISCORD & MIROIR BOT
+  // 11. FORMULAIRE CONFIGURATION DISCORD & MIROIR BOT
   // ==========================================================================
 
   function initDiscordConfigForm() {
     populateDiscordConfigForm();
-
-    const rarityRoutingToggle = document.getElementById('cfg-rarity-routing-toggle');
-    const rarityThreadsGroup = document.getElementById('cfg-rarity-threads-group');
-    if (rarityRoutingToggle && rarityThreadsGroup) {
-      rarityRoutingToggle.addEventListener('change', (e) => {
-        rarityThreadsGroup.style.display = e.target.checked ? 'flex' : 'none';
-      });
-    }
-
-    const priceRoutingToggle = document.getElementById('cfg-price-routing-toggle');
-    const priceThreadsGroup = document.getElementById('cfg-price-threads-group');
-    if (priceRoutingToggle && priceThreadsGroup) {
-      priceRoutingToggle.addEventListener('change', (e) => {
-        priceThreadsGroup.style.display = e.target.checked ? 'flex' : 'none';
-      });
-    }
-
-    const humanCyclesToggle = document.getElementById('cfg-human-cycles-toggle');
-    const humanCyclesSettings = document.getElementById('cfg-human-cycles-settings');
-    if (humanCyclesToggle && humanCyclesSettings) {
-      humanCyclesToggle.addEventListener('change', (e) => {
-        humanCyclesSettings.style.opacity = e.target.checked ? '1' : '0.4';
-        humanCyclesSettings.style.pointerEvents = e.target.checked ? 'auto' : 'none';
-      });
-    }
+    initDiscordRulesHandlers();
   }
 
   function populateDiscordConfigForm() {
@@ -2175,75 +2478,17 @@
     setInputValue('cfg-webhook-url', cfg.webhookUrl);
     setInputValue('cfg-discord-user-id', cfg.discordUserId);
     setInputValue('cfg-pause-thread-id', cfg.pauseThreadId);
-    setInputValue('cfg-target-cards', Array.isArray(cfg.targetCardsList) ? cfg.targetCardsList.join(', ') : '');
 
-    setInputValue('cfg-rarity-routing-toggle', cfg.rarityRoutingEnabled, true);
-    if (cfg.rarityThreads) {
-      setInputValue('cfg-thread-l', cfg.rarityThreads.L);
-      setInputValue('cfg-thread-ur', cfg.rarityThreads.UR);
-      setInputValue('cfg-thread-sr', cfg.rarityThreads.SR);
-      setInputValue('cfg-thread-r', cfg.rarityThreads.R);
-      setInputValue('cfg-thread-pc', cfg.rarityThreads.PC);
-      setInputValue('cfg-thread-c', cfg.rarityThreads.C);
-    }
-
-    setInputValue('cfg-price-routing-toggle', cfg.priceRoutingEnabled, true);
-    if (cfg.priceThreads) {
-      setInputValue('cfg-thread-tier1000', cfg.priceThreads.tier1000);
-      setInputValue('cfg-thread-tier250', cfg.priceThreads.tier250);
-      setInputValue('cfg-thread-tier100', cfg.priceThreads.tier100);
-      setInputValue('cfg-thread-tier50', cfg.priceThreads.tier50);
-      setInputValue('cfg-thread-tier0', cfg.priceThreads.tier0);
-    }
-
-    setInputValue('cfg-min-click-delay', cfg.minClickDelay || 1500);
-    setInputValue('cfg-max-click-delay', cfg.maxClickDelay || 2200);
-    setInputValue('cfg-min-booster-wait', cfg.minBoosterWaitSec || 2.0);
-    setInputValue('cfg-max-booster-wait', cfg.maxBoosterWaitSec || 4.0);
-
-    setInputValue('cfg-human-cycles-toggle', cfg.humanCyclesEnabled, true);
-    setInputValue('cfg-min-active-min', cfg.minActiveMin || 35);
-    setInputValue('cfg-max-active-min', cfg.maxActiveMin || 50);
-    setInputValue('cfg-min-break-min', cfg.minBreakMin || 10);
-    setInputValue('cfg-max-break-min', cfg.maxBreakMin || 25);
+    renderDiscordRules();
   }
 
   function readDiscordConfigForm() {
-    const targetCardsRaw = getInputValue('cfg-target-cards') || '';
-    const targetCardsList = targetCardsRaw.split(',').map((s) => s.trim()).filter(Boolean);
-
     return {
       enabled: getCheckboxValue('cfg-discord-enabled'),
       webhookUrl: getInputValue('cfg-webhook-url'),
       discordUserId: getInputValue('cfg-discord-user-id'),
       pauseThreadId: getInputValue('cfg-pause-thread-id'),
-      targetCardsList: targetCardsList,
-      rarityRoutingEnabled: getCheckboxValue('cfg-rarity-routing-toggle'),
-      priceRoutingEnabled: getCheckboxValue('cfg-price-routing-toggle'),
-      rarityThreads: {
-        L: getInputValue('cfg-thread-l'),
-        UR: getInputValue('cfg-thread-ur'),
-        SR: getInputValue('cfg-thread-sr'),
-        R: getInputValue('cfg-thread-r'),
-        PC: getInputValue('cfg-thread-pc'),
-        C: getInputValue('cfg-thread-c')
-      },
-      priceThreads: {
-        tier1000: getInputValue('cfg-thread-tier1000'),
-        tier250: getInputValue('cfg-thread-tier250'),
-        tier100: getInputValue('cfg-thread-tier100'),
-        tier50: getInputValue('cfg-thread-tier50'),
-        tier0: getInputValue('cfg-thread-tier0')
-      },
-      minClickDelay: parseInt(getInputValue('cfg-min-click-delay'), 10) || 1500,
-      maxClickDelay: parseInt(getInputValue('cfg-max-click-delay'), 10) || 2200,
-      minBoosterWaitSec: parseFloat(getInputValue('cfg-min-booster-wait')) || 2.0,
-      maxBoosterWaitSec: parseFloat(getInputValue('cfg-max-booster-wait')) || 4.0,
-      humanCyclesEnabled: getCheckboxValue('cfg-human-cycles-toggle'),
-      minActiveMin: parseInt(getInputValue('cfg-min-active-min'), 10) || 35,
-      maxActiveMin: parseInt(getInputValue('cfg-max-active-min'), 10) || 50,
-      minBreakMin: parseInt(getInputValue('cfg-min-break-min'), 10) || 10,
-      maxBreakMin: parseInt(getInputValue('cfg-max-break-min'), 10) || 25
+      rules: Array.isArray(state.discordConfig.rules) ? state.discordConfig.rules : [...DEFAULT_DISCORD_CONFIG.rules]
     };
   }
 
@@ -2268,8 +2513,39 @@
   }
 
   // ==========================================================================
-  // 12. ÉCOUTEURS D'ÉVÉNEMENTS GLOBAUX
+  // 12. SIMULATION EN DIRECT & ÉCOUTEURS D'ÉVÉNEMENTS GLOBAUX
   // ==========================================================================
+
+  function toggleSimulationMode(enable) {
+    state.isSimulationMode = enable;
+
+    if (enable) {
+      setConnectionStatus('simulation');
+      logBridgeMessage('Démarrage du flux de simulation en temps réel...', 'info');
+      showToast('Simulation en direct activée : tirages générés en temps réel.', 'info');
+
+      let simCardCounter = state.cards.length + 1;
+      state.simulationInterval = setInterval(() => {
+        const newCard = generateRandomSimulationCard(simCardCounter++);
+        state.cards.push(newCard);
+        updateDashboardData();
+
+        const matching = findMatchingRules(newCard, state.discordConfig.rules);
+        const matchInfo = matching.length > 0 ? ` (Filtre actif : "${matching[0].name}")` : '';
+        logBridgeMessage(`Tirage simulé : [${newCard.rarity}] ${newCard.name} (+${newCard.avgPrice} 🪙)${matchInfo}`, 'success');
+
+        if (newCard.rarity === 'L' || newCard.rarity === 'UR') {
+          showToast(`🌟 Drop Majeur ! [${newCard.rarity}] ${newCard.name} (${newCard.avgPrice} 🪙)`, 'success');
+        }
+      }, 3500);
+    } else {
+      if (state.simulationInterval) clearInterval(state.simulationInterval);
+      state.simulationInterval = null;
+      setConnectionStatus('disconnected');
+      logBridgeMessage('Flux de simulation arrêté.', 'warn');
+      showToast('Simulation en direct désactivée.', 'info');
+    }
+  }
 
   function initEventListeners() {
     const btnSyncManual = document.getElementById('btn-sync-now');
@@ -2322,21 +2598,7 @@
     if (btnSaveConfig) {
       btnSaveConfig.addEventListener('click', () => {
         state.discordConfig = readDiscordConfigForm();
-        persistData();
-        showToast('Configuration enregistrée avec succès !', 'success');
-        logBridgeMessage('Paramètres Discord & Bot sauvegardés en local.', 'success');
-
-        if (state.extensionId && window.chrome?.runtime?.sendMessage) {
-          window.chrome.runtime.sendMessage(
-            state.extensionId,
-            { action: 'saveWikiMastersConfig', config: state.discordConfig },
-            (resp) => {
-              if (!window.chrome.runtime.lastError && resp?.success) {
-                logBridgeMessage('Configuration synchronisée avec le Service Worker !', 'success');
-              }
-            }
-          );
-        }
+        saveAndSyncDiscordConfig(true);
       });
     }
 
@@ -2357,11 +2619,11 @@
           embeds: [
             {
               title: '🔔 Test de Connexion WikiMasters Réussi !',
-              description: 'Ce message confirme que votre Webhook Discord est parfaitement configuré avec le **Dashboard Web WikiMasters**.',
+              description: 'Ce message confirme que votre Webhook Discord principal est parfaitement configuré avec le **Dashboard Web WikiMasters**.',
               color: 0x06b6d4,
               fields: [
                 { name: 'Statut', value: '✅ Opérationnel', inline: true },
-                { name: 'Mode', value: '🌐 Dashboard Web', inline: true },
+                { name: 'Filtres Personnalisés', value: `${(state.discordConfig.rules || []).length} règle(s) active(s)`, inline: true },
                 { name: 'Conseils Revente', value: 'Calculés automatiquement à 50% - 75%', inline: false }
               ],
               footer: { text: 'WikiMasters Dashboard Tracker' },
