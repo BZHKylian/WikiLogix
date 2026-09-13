@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>WikiMasters Auto-Booster Pro</title>
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM "DEEP CYBER & GEMSTONES" — WIKIMASTERS PRO v3.2
+       ========================================================================== */
+    :root {
+      --bg-dark: #060911;
+      --bg-gradient: radial-gradient(135% 100% at 50% 0%, #111a33 0%, #060911 80%);
+      --surface-glass: rgba(14, 22, 38, 0.72);
+      --surface-glass-hover: rgba(22, 34, 58, 0.88);
+      --surface-subtle: rgba(10, 16, 28, 0.85);
+      
+      --border-light: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(56, 189, 248, 0.5);
+      --border-hover: rgba(255, 255, 255, 0.16);
+
+      --accent-cyan: #38bdf8;
+      --accent-cyan-glow: rgba(56, 189, 248, 0.35);
+      --accent-purple: #818cf8;
+      --accent-purple-glow: rgba(129, 140, 248, 0.35);
+      
+      --color-success: #10b981;
+      --color-success-glow: rgba(16, 185, 129, 0.4);
+      --color-danger: #f43f5e;
+      --color-danger-glow: rgba(244, 63, 94, 0.4);
+      --color-warning: #f59e0b;
+      --color-warning-glow: rgba(245, 158, 11, 0.35);
+
+      --text-main: #f8fafc;
+      --text-sub: #cbd5e1;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+
+      /* Palette des Raretés Gemstones */
+      --rarity-legendaire: #eab308;
+      --rarity-legendaire-glow: rgba(234, 179, 8, 0.25);
+      --rarity-ultra-rare: #f97316;
+      --rarity-ultra-rare-glow: rgba(249, 115, 22, 0.25);
+      --rarity-super-rare: #a855f7;
+      --rarity-super-rare-glow: rgba(168, 85, 247, 0.25);
+      --rarity-rare: #3b82f6;
+      --rarity-rare-glow: rgba(59, 130, 246, 0.25);
+      --rarity-peu-commune: #22c55e;
+      --rarity-peu-commune-glow: rgba(34, 197, 94, 0.25);
+      --rarity-commune: #94a3b8;
+      --rarity-commune-glow: rgba(148, 163, 184, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 360px;
+      min-height: 530px;
+      max-height: 590px;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      padding: 14px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::-webkit-scrollbar {
+      width: 4px;
+    }
+    body::-webkit-scrollbar-track {
+      background: rgba(6, 9, 17, 0.5);
+    }
+    body::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.25);
+      border-radius: 4px;
+    }
+
+    /* ==========================================================================
+       1. EN-TÊTE FIXE & BADGE DE STATUT DYNAMIQUE
+       ========================================================================== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 14.5px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    .brand-text span {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(244, 63, 94, 0.12);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-badge.active {
+      background: rgba(16, 185, 129, 0.14);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .status-badge.break {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .status-badge.active .status-dot {
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ==========================================================================
+       2. NAVIGATION PAR ONGLETS (SEGMENTED CONTROL MODERNE)
+       ========================================================================== */
+    .tabs-nav {
+      display: flex;
+      gap: 4px;
+      background: rgba(11, 17, 30, 0.75);
+      padding: 4px;
+      border-radius: 11px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-light);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 7px 0;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(129, 140, 248, 0.16) 100%);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: tabFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       3. HERO BUTTON (START / STOP INTERACTIF)
+       ========================================================================== */
+    .toggle-main {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 11px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .toggle-main.inactive {
+      background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+
+    .toggle-main.inactive:hover {
+      box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      transform: translateY(-1.5px);
+    }
+
+    .toggle-main.active {
+      background: linear-gradient(135deg, #e11d48 0%, #f43f5e 50%, #fb7185 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(244, 63, 94, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+
+    .toggle-main.active:hover {
+      box-shadow: 0 6px 22px rgba(244, 63, 94, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      transform: translateY(-1.5px);
+    }
+
+    .toggle-main:active {
+      transform: translateY(0.5px) scale(0.99);
+    }
+
+    /* ==========================================================================
+       4. BANNIÈRE LIVE DE CYCLE & TEMPORISATEUR
+       ========================================================================== */
+    .cycle-live-card {
+      background: rgba(14, 22, 38, 0.75);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 10px;
+      padding: 9px 12px;
+      margin-bottom: 11px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--text-sub);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .cycle-live-card.break-mode {
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fef3c7;
+      background: rgba(245, 158, 11, 0.09);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.15);
+    }
+
+    .cycle-live-card b {
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .cycle-live-card.break-mode b {
+      color: var(--color-warning);
+    }
+
+    /* ==========================================================================
+       5. GRILLE STATISTIQUES PRINCIPALES
+       ========================================================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 11px;
+    }
+
+    .stat-card {
+      background: var(--surface-glass);
+      border: 1px solid var(--border-light);
+      border-radius: 11px;
+      padding: 10px 12px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      background: var(--surface-glass-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0.4;
+    }
+
+    .stat-icon {
+      font-size: 14px;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .stat-num {
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--accent-cyan);
+      letter-spacing: -0.6px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    /* ==========================================================================
+       6. GRILLE DE RARETÉS "GEMSTONES"
+       ========================================================================== */
+    .glass-section {
+      background: var(--surface-glass);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 11px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .section-header {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rarity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .rarity-pill {
+      border-radius: 9px;
+      padding: 7px 5px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .rarity-pill:hover {
+      transform: translateY(-1.5px);
+    }
+
+    .rarity-val {
+      font-size: 13.5px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .rarity-lbl {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-top: 2px;
+    }
+
+    .rp-legendaire {
+      background: rgba(234, 179, 8, 0.12);
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      color: #fde047;
+      box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.12);
+    }
+    .rp-legendaire:hover { box-shadow: 0 0 12px var(--rarity-legendaire-glow); }
+
+    .rp-ultra-rare {
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      color: #fb923c;
+    }
+    .rp-ultra-rare:hover { box-shadow: 0 0 12px var(--rarity-ultra-rare-glow); }
+
+    .rp-super-rare {
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #c084fc;
+    }
+    .rp-super-rare:hover { box-shadow: 0 0 12px var(--rarity-super-rare-glow); }
+
+    .rp-rare {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+    }
+    .rp-rare:hover { box-shadow: 0 0 12px var(--rarity-rare-glow); }
+
+    .rp-peu-commune {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+    }
+    .rp-peu-commune:hover { box-shadow: 0 0 12px var(--rarity-peu-commune-glow); }
+
+    .rp-commune {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: #cbd5e1;
+    }
+    .rp-commune:hover { box-shadow: 0 0 10px var(--rarity-commune-glow); }
+
+    /* Boutons de bas de page Dashboard */
+    .btn-row {
+      display: flex;
+      gap: 7px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 8px 10px;
+      background: rgba(22, 32, 54, 0.8);
+      border: 1px solid var(--border-light);
+      border-radius: 9px;
+      color: var(--text-sub);
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(34, 48, 80, 0.9);
+      color: #fff;
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger-light {
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.25);
+    }
+    .btn-danger-light:hover {
+      background: rgba(244, 63, 94, 0.16);
+      border-color: rgba(244, 63, 94, 0.45);
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       7. ONGLET LIVE FEED (ACTIVITÉ & DROPS EN TEMPS RÉEL)
+       ========================================================================== */
+    .live-status-hero {
+      background: rgba(14, 22, 38, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 11px;
+      padding: 9px 12px;
+      margin-bottom: 11px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    .live-status-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--accent-cyan);
+      margin-bottom: 3px;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulseGreen 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .live-action-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .feed-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .feed-count-pill {
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent-cyan);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 9px;
+      font-weight: 700;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .live-feed-list {
+      max-height: 295px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding-right: 2px;
+    }
+
+    .live-feed-list::-webkit-scrollbar {
+      width: 3px;
+    }
+    .live-feed-list::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+    }
+
+    .feed-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(14, 22, 38, 0.7);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 8px 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .feed-item:hover {
+      background: var(--surface-glass-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .border-commune { border-left: 3px solid var(--rarity-commune); }
+    .border-peu-commune { border-left: 3px solid var(--rarity-peu-commune); }
+    .border-rare { border-left: 3px solid var(--rarity-rare); }
+    .border-super-rare { border-left: 3px solid var(--rarity-super-rare); }
+    .border-ultra-rare { border-left: 3px solid var(--rarity-ultra-rare); }
+    .border-legendaire { border-left: 3px solid var(--rarity-legendaire); box-shadow: inset 0 0 12px rgba(234, 179, 8, 0.12); }
+
+    .feed-img-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 7px;
+      background: #090e1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feed-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .feed-details {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .feed-top-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .feed-card-name {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .feed-time {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .feed-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    .feed-rarity-tag {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 5px;
+      letter-spacing: 0.2px;
+    }
+
+    .fr-commune { background: rgba(148, 163, 184, 0.16); color: #cbd5e1; }
+    .fr-peu-commune { background: rgba(34, 197, 94, 0.16); color: #4ade80; }
+    .fr-rare { background: rgba(59, 130, 246, 0.16); color: #60a5fa; }
+    .fr-super-rare { background: rgba(168, 85, 247, 0.16); color: #c084fc; }
+    .fr-ultra-rare { background: rgba(249, 115, 22, 0.16); color: #fb923c; }
+    .fr-legendaire { background: rgba(234, 179, 8, 0.22); color: #fde047; }
+
+    .feed-price {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .empty-feed {
+      text-align: center;
+      padding: 40px 10px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       8. ONGLET PARAMÈTRES (CONFIGURATIONS & DISCORD)
+       ========================================================================== */
+    .settings-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 10.5px;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .switch-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    /* Toggle Switch iOS-style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 18px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(14px); }
+
+    .disabled-group {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 85px 1fr;
+      gap: 5px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .grid-2col:last-child {
+      margin-bottom: 0;
+    }
+
+    .col-label {
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .number-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 16px 1fr;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+
+    .number-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .input-num {
+      width: 100%;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: 7px;
+      padding: 5px 6px;
+      font-size: 10.5px;
+      color: #fff;
+      text-align: center;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-num:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
+    }
+
+    .sep {
+      color: var(--text-muted);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .btn-save-primary {
+      width: 100%;
+      padding: 9px 12px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(129, 140, 248, 0.22) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 10px;
+      color: var(--accent-cyan);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+
+    .btn-save-primary:hover {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.35) 0%, rgba(129, 140, 248, 0.35) 100%);
+      color: #fff;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px var(--accent-cyan-glow);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. EN-TÊTE FIXE -->
+  <div class="header">
+    <div class="brand-title">
+      <div class="brand-logo-badge">W</div>
+      <div class="brand-text">
+        <h1>WikiMasters PRO</h1>
+        <span>Auto-Booster & Tracker</span>
+      </div>
+    </div>
+    <div id="statusBadge" class="status-badge">
+      <span class="status-dot"></span>
+      <span id="statusText">INACTIF</span>
+    </div>
+  </div>
+
+  <!-- 2. NAVIGATION PAR ONGLETS -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" data-tab="tab-dashboard">
+      <span>📊</span> Dashboard
+    </button>
+    <button class="tab-btn" data-tab="tab-feed">
+      <span>📜</span> Live Feed
+    </button>
+    <button class="tab-btn" data-tab="tab-settings">
+      <span>⚙️</span> Config
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       ONGLET 1 : DASHBOARD PRINCIPAL
+       ========================================================================= -->
+  <div id="tab-dashboard" class="tab-content active">
+    
+    <!-- Bouton Hero Start/Stop -->
+    <button id="toggleBtn" class="toggle-main inactive">
+      <span>⚡ LANCER LE BOT</span>
+    </button>
+
+    <!-- Statut en direct & cycle -->
+    <div id="cycleLiveCard" class="cycle-live-card">
+      <span id="cycleLiveText">Bot en veille</span>
+    </div>
+
+    <!-- Grille des statistiques de session -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📦</span>
+        <div id="packsCount" class="stat-num">0</div>
+        <div class="stat-label">Boosters ouverts</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🃏</span>
+        <div id="cardsCount" class="stat-num">0</div>
+        <div class="stat-label">Cartes récoltées</div>
+      </div>
+    </div>
+
+    <!-- Grille des Raretés "Gemstone" -->
+    <div class="glass-section">
+      <div class="section-header">
+        <span>✨ Raretés Obtenues</span>
+      </div>
+      <div class="rarity-grid">
+        <div class="rarity-pill rp-commune">
+          <div id="countCommune" class="rarity-val">0</div>
+          <div class="rarity-lbl">Commune</div>
+        </div>
+        <div class="rarity-pill rp-peu-commune">
+          <div id="countPeuCommune" class="rarity-val">0</div>
+          <div class="rarity-lbl">Peu com.</div>
+        </div>
+        <div class="rarity-pill rp-rare">
+          <div id="countRare" class="rarity-val">0</div>
+          <div class="rarity-lbl">Rare</div>
+        </div>
+        <div class="rarity-pill rp-super-rare">
+          <div id="countSuperRare" class="rarity-val">0</div>
+          <div class="rarity-lbl">S. Rare</div>
+        </div>
+        <div class="rarity-pill rp-ultra-rare">
+          <div id="countUltraRare" class="rarity-val">0</div>
+          <div class="rarity-lbl">U. Rare</div>
+        </div>
+        <div class="rarity-pill rp-legendaire">
+          <div id="countLegendaire" class="rarity-val">0</div>
+          <div class="rarity-lbl">Légendaire</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions secondaires -->
+    <div class="btn-row">
+      <button id="exportCsvBtn" class="btn-secondary">
+        <span>📥</span> Exporter CSV
+      </button>
+      <button id="resetStatsBtn" class="btn-secondary btn-danger-light">
+        <span>🗑️</span> Reset stats
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       ONGLET 2 : HISTORIQUE & LIVE FEED
+       ========================================================================= -->
+  <div id="tab-feed" class="tab-content">
+    
+    <div class="live-status-hero">
+      <div class="live-status-tag">
+        <span class="pulse-dot"></span>
+        <span>ACTION EN COURS</span>
+      </div>
+      <div id="liveActionText" class="live-action-text">Bot en veille</div>
+    </div>
+
+    <div class="feed-header-row">
+      <div class="section-header" style="margin-bottom: 0;">
+        <span>⚡ 10 Derniers Tirages</span>
+      </div>
+      <span id="feedCountBadge" class="feed-count-pill">0 cartes</span>
+    </div>
+
+    <div id="liveFeedList" class="live-feed-list">
+      <div class="empty-feed">Aucune carte capturée pour l'instant</div>
+    </div>
+
+    <button id="clearFeedBtn" class="btn-secondary btn-danger-light" style="width: 100%; margin-top: 9px;">
+      <span>🗑️</span> Vider l'historique visuel
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       ONGLET 3 : CONFIGURATIONS & DISCORD
+       ========================================================================= -->
+  <div id="tab-settings" class="tab-content">
+    <div class="settings-stack">
+      
+      <!-- Webhook Discord -->
+      <div class="glass-section">
+        <div class="section-header">
+          <span>🔔 Webhook Discord Principal</span>
+        </div>
+        <input type="text" id="discordWebhookUrl" class="text-input" placeholder="https://discord.com/api/webhooks/...">
+      </div>
+
+      <!-- Mention Discord -->
+      <div class="glass-section">
+        <div class="section-header">
+          <span>👤 ID Discord (Mention Drops Majeurs)</span>
+        </div>
+        <input type="text" id="discordUserId" class="text-input" placeholder="Ex: 248109823098234890 ou @here">
+      </div>
+
+      <!-- Salon de pause -->
+      <div class="glass-section">
+        <div class="section-header">
+          <span>☕ Salon / Fil Discord Statut (Pause)</span>
+        </div>
+        <input type="text" id="pauseThreadId" class="text-input" placeholder="Ex: 129038102938109283 (Optionnel)">
+      </div>
+
+      <!-- Routage par Rareté -->
+      <div class="glass-section">
+        <div class="switch-row">
+          <span class="switch-title">✨ Routage par Rareté</span>
+          <label class="switch">
+            <input type="checkbox" id="rarityRoutingEnabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="rarityThreadsGroup">
+          <div class="grid-2col">
+            <span class="col-label" style="color: var(--rarity-legendaire);">Légendaire</span>
+            <input type="text" id="threadLegendaire" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: var(--rarity-ultra-rare);">Ultra rare</span>
+            <input type="text" id="threadUltraRare" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: var(--rarity-super-rare);">Super rare</span>
+            <input type="text" id="threadSuperRare" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: var(--rarity-rare);">Rare</span>
+            <input type="text" id="threadRare" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: var(--rarity-peu-commune);">Peu com.</span>
+            <input type="text" id="threadPeuCommune" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: var(--rarity-commune);">Commune</span>
+            <input type="text" id="threadCommune" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Routage par Prix Marché -->
+      <div class="glass-section">
+        <div class="switch-row">
+          <span class="switch-title">💰 Routage par Prix Marché</span>
+          <label class="switch">
+            <input type="checkbox" id="priceRoutingEnabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="priceThreadsGroup">
+          <div class="grid-2col">
+            <span class="col-label" style="color: #f59e0b;">+1000 🪙</span>
+            <input type="text" id="threadTier1000" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: #c084fc;">250 - 1000 🪙</span>
+            <input type="text" id="threadTier250" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: #60a5fa;">100 - 250 🪙</span>
+            <input type="text" id="threadTier100" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: #4ade80;">50 - 100 🪙</span>
+            <input type="text" id="threadTier50" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+          <div class="grid-2col">
+            <span class="col-label" style="color: #cbd5e1;">0 - 50 🪙</span>
+            <input type="text" id="threadTier0" class="text-input" placeholder="ID thread" style="padding: 4px 6px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Cartes Cibles -->
+      <div class="glass-section">
+        <div class="section-header">
+          <span>🎯 Cartes Cibles Prioritaires</span>
+        </div>
+        <input type="text" id="targetInput" class="text-input" placeholder="Ex: Adèle Castillon, Squeezie...">
+      </div>
+
+      <!-- Délais & Temporisations -->
+      <div class="glass-section">
+        <div class="section-header">
+          <span>⏱️ Délais & Temporisations</span>
+        </div>
+        <div class="number-row">
+          <span class="col-label" style="color: var(--text-sub);">🎲 Clics (ms)</span>
+          <input type="number" id="minClickDelay" class="input-num" placeholder="1500" min="1500" value="1500" step="50">
+          <span class="sep">à</span>
+          <input type="number" id="maxClickDelay" class="input-num" placeholder="2200" min="1500" value="2200" step="50">
+        </div>
+        <div class="number-row">
+          <span class="col-label" style="color: var(--text-sub);">📦 Booster (s)</span>
+          <input type="number" id="minBoosterWaitSec" class="input-num" placeholder="2.0" step="0.5">
+          <span class="sep">à</span>
+          <input type="number" id="maxBoosterWaitSec" class="input-num" placeholder="4.0" step="0.5">
+        </div>
+      </div>
+
+      <!-- Cycles Humains Farm & Pause -->
+      <div class="glass-section">
+        <div class="switch-row">
+          <span class="switch-title">☕ Cycles Humains (Farm & Pause)</span>
+          <label class="switch">
+            <input type="checkbox" id="humanCyclesEnabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="humanCyclesSettings">
+          <div class="number-row">
+            <span class="col-label" style="color: #4ade80;">🟢 Farm (min)</span>
+            <input type="number" id="minActiveMin" class="input-num" placeholder="3" step="0.1">
+            <span class="sep">à</span>
+            <input type="number" id="maxActiveMin" class="input-num" placeholder="5" step="0.1">
+          </div>
+          <div class="number-row">
+            <span class="col-label" style="color: #fbbf24;">☕ Pause (min)</span>
+            <input type="number" id="minBreakMin" class="input-num" placeholder="10" step="0.1">
+            <span class="sep">à</span>
+            <input type="number" id="maxBreakMin" class="input-num" placeholder="30" step="0.1">
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton d'enregistrement -->
+      <button id="saveConfigBtn" class="btn-save-primary">
+        <span>💾</span> Enregistrer la configuration
+      </button>
+
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

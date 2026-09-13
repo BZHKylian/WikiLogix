@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WikiMasters — Dashboard Central & Moteur Économique</title>
+  <meta name="description" content="Dashboard Web moderne pour centraliser les statistiques, l'historique et la configuration de l'extension WikiMasters.">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- ====================================================================
+         SIDEBAR NAVIGATION GAUCHE
+         ==================================================================== -->
+    <aside class="dashboard-sidebar">
+      <div class="brand-section">
+        <div class="brand-logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">WikiMasters <span class="brand-badge">PRO</span></div>
+          <div class="brand-subtitle">Analytics & Bot Hub</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active" data-tab="tab-overview" id="nav-overview">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+          Vue d'ensemble
+        </a>
+        <a class="nav-item" data-tab="tab-charts" id="nav-charts">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+          Analyses Graphiques
+        </a>
+        <a class="nav-item" data-tab="tab-cards" id="nav-cards">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          Historique des Cartes
+        </a>
+        <a class="nav-item" data-tab="tab-config" id="nav-config">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          Miroir Bot & Discord
+        </a>
+        <a class="nav-item" data-tab="tab-bridge" id="nav-bridge">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 7h-4v2h4c1.65 0 3 1.35 3 3s-1.35 3-3 3h-4v2h4c2.76 0 5-2.24 5-5s-2.24-5-5-5zm-6 8H7c-1.65 0-3-1.35-3-3s1.35-3 3-3h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-2zm-3-4h8v2H8z"/></svg>
+          Liaison Extension
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-status-box">
+          <div class="status-indicator">
+            <span class="status-dot disconnected" id="sidebar-status-dot"></span>
+            <span id="sidebar-status-text">Déconnecté</span>
+          </div>
+        </div>
+        <p style="text-align: center;">WikiMasters Engine v1.6.0</p>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         CONTENU PRINCIPAL DU DASHBOARD
+         ==================================================================== -->
+    <main class="dashboard-main">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-title-group">
+          <h1>Centre de Contrôle WikiMasters</h1>
+          <p>Supervision des tirages, analyse financière en temps réel & configuration miroir</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="auto-sync-wrapper">
+            <span>Auto-Sync</span>
+            <label class="switch">
+              <input type="checkbox" id="toggle-auto-sync">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" id="btn-toggle-simulation">
+            Lancer Simulation Directe
+          </button>
+
+          <button class="btn btn-primary" id="btn-sync-now">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+            Synchroniser
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================================================================
+           ONGLET 1 : VUE D'ENSEMBLE (KPIs & RÉSUMÉ)
+           ================================================================== -->
+      <section class="tab-pane active" id="tab-overview">
+        <!-- GRILLE DES KPIS -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-card-glow"></div>
+            <div class="kpi-header">
+              <span class="kpi-label">Boosters Ouverts</span>
+              <div class="kpi-icon-box">📦</div>
+            </div>
+            <div class="kpi-value" id="kpi-val-boosters">0</div>
+            <div class="kpi-subtext">Session de farm en cours</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-card-glow" style="background: var(--cyber-blue);"></div>
+            <div class="kpi-header">
+              <span class="kpi-label">Cartes Collectées</span>
+              <div class="kpi-icon-box">🎴</div>
+            </div>
+            <div class="kpi-value" id="kpi-val-cards">0</div>
+            <div class="kpi-subtext">Total cartes répertoriées</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-card-glow" style="background: var(--cyber-amber);"></div>
+            <div class="kpi-header">
+              <span class="kpi-label">Valeur Estimée Globale</span>
+              <div class="kpi-icon-box">🪙</div>
+            </div>
+            <div class="kpi-value" id="kpi-val-total-value">0 🪙</div>
+            <div class="kpi-subtext">
+              Moyenne : <span class="highlight-gain" id="kpi-val-avg-booster">~0 🪙</span> / booster
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-card-glow" style="background: var(--cyber-emerald);"></div>
+            <div class="kpi-header">
+              <span class="kpi-label">Revente Conseillée</span>
+              <div class="kpi-icon-box">💰</div>
+            </div>
+            <div class="kpi-value" style="font-size: 20px;" id="kpi-val-resale-range">0 - 0 🪙</div>
+            <div class="kpi-subtext">Fourchette stratégique (50% - 75%)</div>
+          </div>
+        </div>
+
+        <!-- BANDEAU DES RARETÉS -->
+        <div class="rarity-pills-strip">
+          <div class="rarity-pill-card" style="border-left: 3px solid var(--gem-l);">
+            <div class="pill-header">
+              <span class="pill-tag" style="background: var(--gem-l-glow); color: var(--gem-l);">[L] Légendaire</span>
+            </div>
+            <div class="pill-count" id="pill-count-l" style="color: var(--gem-l);">0</div>
+            <div class="pill-rate" id="pill-rate-l">0.0%</div>
+          </div>
+
+          <div class="rarity-pill-card" style="border-left: 3px solid var(--gem-ur);">
+            <div class="pill-header">
+              <span class="pill-tag" style="background: var(--gem-ur-glow); color: var(--gem-ur);">[UR] Ultra Rare</span>
+            </div>
+            <div class="pill-count" id="pill-count-ur" style="color: var(--gem-ur);">0</div>
+            <div class="pill-rate" id="pill-rate-ur">0.0%</div>
+          </div>
+
+          <div class="rarity-pill-card" style="border-left: 3px solid var(--gem-sr);">
+            <div class="pill-header">
+              <span class="pill-tag" style="background: var(--gem-sr-glow); color: var(--gem-sr);">[SR] Super Rare</span>
+            </div>
+            <div class="pill-count" id="pill-count-sr" style="color: var(--gem-sr);">0</div>
+            <div class="pill-rate" id="pill-rate-sr">0.0%</div>
+          </div>
+
+          <div class="rarity-pill-card" style="border-left: 3px solid var(--gem-r);">
+            <div class="pill-header">
+              <span class="pill-tag" style="background: var(--gem-r-glow); color: var(--gem-r);">[R] Rare</span>
+            </div>
+            <div class="pill-count" id="pill-count-r" style="color: var(--gem-r);">0</div>
+            <div class="pill-rate" id="pill-rate-r">0.0%</div>
+          </div>
+
+          <div class="rarity-pill-card" style="border-left: 3px solid var(--gem-pc);">
+            <div class="pill-header">
+              <span class="pill-tag" style="background: var(--gem-pc-glow); color: var(--gem-pc);">[PC] Peu Commune</span>
+            </div>
+            <div class="pill-count" id="pill-count-pc" style="color: var(--gem-pc);">0</div>
+            <div class="pill-rate" id="pill-rate-pc">0.0%</div>
+          </div>
+
+          <div class="rarity-pill-card" style="border-left: 3px solid var(--gem-c);">
+            <div class="pill-header">
+              <span class="pill-tag" style="background: var(--gem-c-glow); color: var(--gem-c);">[C] Commune</span>
+            </div>
+            <div class="pill-count" id="pill-count-c" style="color: var(--gem-c);">0</div>
+            <div class="pill-rate" id="pill-rate-c">0.0%</div>
+          </div>
+        </div>
+
+        <!-- GRAPHIQUES DE LA VUE D'ENSEMBLE -->
+        <div class="charts-grid-2col">
+          <!-- AREA CHART GAINS CUMULÉS -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title-box">
+                <h3>Évolution des Gains Cumulés</h3>
+                <p>Croissance progressive de la valeur brute (🪙) au fil des cartes tirées</p>
+              </div>
+            </div>
+            <div class="canvas-container">
+              <canvas id="canvas-gains-evolution"></canvas>
+              <div class="custom-chart-tooltip" id="tooltip-gains-chart"></div>
+            </div>
+          </div>
+
+          <!-- DONUT CHART RARETÉS -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title-box">
+                <h3>Distribution des Raretés</h3>
+                <p>Répartition globale des tirages</p>
+              </div>
+            </div>
+            <div class="donut-chart-wrapper">
+              <div class="donut-canvas-box">
+                <canvas id="canvas-rarity-donut"></canvas>
+                <div class="donut-center-info">
+                  <div class="donut-center-count" id="donut-center-count">0</div>
+                  <div class="donut-center-label" id="donut-center-label">Cartes Totales</div>
+                </div>
+              </div>
+              <div class="donut-legend-container" id="donut-rarity-legend"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           ONGLET 2 : ANALYSES GRAPHIQUES APPROFONDIES
+           ================================================================== -->
+      <section class="tab-pane" id="tab-charts">
+        <div class="chart-card" style="margin-bottom: 24px;">
+          <div class="chart-card-header">
+            <div class="chart-title-box">
+              <h3>Paliers de Prix de Revente du Marché</h3>
+              <p>Classement du volume de cartes par tranche de valeur économique réelle (en 🪙)</p>
+            </div>
+          </div>
+          <div class="canvas-container" style="height: 250px;">
+            <canvas id="canvas-price-tiers"></canvas>
+          </div>
+        </div>
+
+        <div class="charts-grid-2col">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title-box">
+                <h3>Métriques & Performance Financière</h3>
+                <p>Indicateurs clés de rentabilité et retour sur investissement</p>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
+              <div class="stat-cell">
+                <div class="stat-cell-label">Carte la plus chère tirée</div>
+                <div class="stat-cell-value" id="metrics-top-card" style="color: var(--gem-l);">--</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="metrics-top-card-name">Aucune carte</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">Moyenne Réelle / Carte</div>
+                <div class="stat-cell-value" id="metrics-avg-card" style="color: var(--cyber-cyan);">0 🪙</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Sur toutes les raretés</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">Revente Moyenne / Booster</div>
+                <div class="stat-cell-value" id="metrics-resale-booster" style="color: var(--cyber-emerald);">0 🪙</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Conseil (50% - 75%)</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-cell-label">Taux Drops Rares (SR, UR, L)</div>
+                <div class="stat-cell-value" id="metrics-high-tier-rate" style="color: var(--gem-sr);">0.0%</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Volume premium</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title-box">
+                <h3>Stratégie de Revente Recommandée</h3>
+                <p>Conseils automatiques d'enchères et vente rapide</p>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); margin-top: 6px;">
+              <div style="padding: 10px 14px; background: rgba(255, 225, 68, 0.08); border-left: 3px solid var(--gem-l); border-radius: 4px;">
+                <strong style="color: var(--gem-l);">Cartes Légendaires & UR :</strong> Mettre aux enchères à 75% du prix moyen pour maximiser le bénéfice en 🪙.
+              </div>
+              <div style="padding: 10px 14px; background: rgba(6, 182, 212, 0.08); border-left: 3px solid var(--cyber-cyan); border-radius: 4px;">
+                <strong style="color: var(--cyber-cyan);">Cartes Super Rares & Rares :</strong> Vente directe immédiate à 60% pour une rotation rapide de trésorerie.
+              </div>
+              <div style="padding: 10px 14px; background: rgba(184, 242, 213, 0.08); border-left: 3px solid var(--gem-c); border-radius: 4px;">
+                <strong style="color: var(--gem-c);">Cartes Communes :</strong> Défausser ou revente en lot au prix plancher (50%).
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           ONGLET 3 : HISTORIQUE DES CARTES & TABLEAU INTERACTIF
+           ================================================================== -->
+      <section class="tab-pane" id="tab-cards">
+        <div class="table-controls-bar">
+          <div class="search-input-box">
+            <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="table-search-input" placeholder="Rechercher une carte par nom ou mot-clé...">
+          </div>
+
+          <div class="filter-chips-group">
+            <button class="filter-chip active" data-rarity="ALL">Toutes</button>
+            <button class="filter-chip" data-rarity="L">Légendaires</button>
+            <button class="filter-chip" data-rarity="UR">Ultra Rares</button>
+            <button class="filter-chip" data-rarity="SR">Super Rares</button>
+            <button class="filter-chip" data-rarity="R">Rares</button>
+            <button class="filter-chip" data-rarity="PC">Peu Communes</button>
+            <button class="filter-chip" data-rarity="C">Communes</button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 12px; color: var(--text-muted);">Afficher :</span>
+            <select id="items-per-page-select" class="form-input" style="width: 75px; padding: 6px 8px;">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-card-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="name">Carte</th>
+                <th class="sortable" data-sort="rarity">Rareté</th>
+                <th class="sortable" data-sort="price">Prix Marché</th>
+                <th>Conseil Revente (50-75%)</th>
+                <th>Tirage</th>
+                <th class="sortable" data-sort="timestamp">Date & Heure</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="cards-table-body">
+              <!-- Rempli dynamiquement par app.js -->
+            </tbody>
+          </table>
+
+          <div class="table-pagination-bar">
+            <span id="pagination-info-text">Chargement...</span>
+            <div class="pagination-controls" id="pagination-buttons-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           ONGLET 4 : CONFIGURATION MIROIR (BOT & DISCORD)
+           ================================================================== -->
+      <section class="tab-pane" id="tab-config">
+        <div class="config-grid">
+          <!-- CARTE DISCORD WEBHOOK -->
+          <div class="config-card">
+            <div class="config-card-header">
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z"/></svg>
+                Notifications & Webhook Discord
+              </h3>
+              <label class="switch">
+                <input type="checkbox" id="cfg-discord-enabled">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-webhook-url">URL du Webhook Discord Principal</label>
+              <input type="text" id="cfg-webhook-url" class="form-input" placeholder="https://discord.com/api/webhooks/...">
+              <div class="form-hint">Webhook vers lequel seront envoyés les embeds de tirage</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-discord-user-id">ID Utilisateur Discord (Mentions)</label>
+              <input type="text" id="cfg-discord-user-id" class="form-input" placeholder="Ex: 123456789012345678">
+              <div class="form-hint">Recevra un ping &lt;@ID&gt; lors des drops majeurs (Légendaires / UR)</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-pause-thread-id">ID du Fil / Salon de Pause</label>
+              <input type="text" id="cfg-pause-thread-id" class="form-input" placeholder="Ex: 987654321098765432">
+              <div class="form-hint">Fil Discord pour notifier les débuts et fins de cycles de repos</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cfg-target-cards">Cartes Prioritaires Ciblées (séparées par virgule)</label>
+              <input type="text" id="cfg-target-cards" class="form-input" placeholder="Adèle Castillon, Albert Einstein...">
+            </div>
+
+            <button class="btn btn-secondary" id="btn-test-discord-webhook" style="width: 100%;">
+              Tester le Webhook Discord
+            </button>
+          </div>
+
+          <!-- CARTE ROUTAGE MULTI-FILS DISCORD -->
+          <div class="config-card">
+            <div class="config-card-header">
+              <h3>Routage des Alertes par Fil Discord</h3>
+            </div>
+
+            <!-- ROUTAGE PAR RARETÉ -->
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="form-label" style="margin-bottom: 0;">Routage par Rareté (Thread ID)</span>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-rarity-routing-toggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="routing-threads-list" id="cfg-rarity-threads-group">
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: var(--gem-l-glow); color: var(--gem-l);">Légendaire</span>
+                  <input type="text" id="cfg-thread-l" class="form-input" placeholder="Thread ID Légendaires">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: var(--gem-ur-glow); color: var(--gem-ur);">Ultra Rare</span>
+                  <input type="text" id="cfg-thread-ur" class="form-input" placeholder="Thread ID Ultra Rares">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: var(--gem-sr-glow); color: var(--gem-sr);">Super Rare</span>
+                  <input type="text" id="cfg-thread-sr" class="form-input" placeholder="Thread ID Super Rares">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: var(--gem-r-glow); color: var(--gem-r);">Rare</span>
+                  <input type="text" id="cfg-thread-r" class="form-input" placeholder="Thread ID Rares">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: var(--gem-pc-glow); color: var(--gem-pc);">Peu Commune</span>
+                  <input type="text" id="cfg-thread-pc" class="form-input" placeholder="Thread ID Peu Communes">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: var(--gem-c-glow); color: var(--gem-c);">Commune</span>
+                  <input type="text" id="cfg-thread-c" class="form-input" placeholder="Thread ID Communes">
+                </div>
+              </div>
+            </div>
+
+            <!-- ROUTAGE PAR PALIERS DE PRIX -->
+            <div class="form-group" style="margin-top: 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="form-label" style="margin-bottom: 0;">Routage par Palier de Prix (Thread ID)</span>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-price-routing-toggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="routing-threads-list" id="cfg-price-threads-group">
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: rgba(255, 225, 68, 0.2); color: #ffe144;">+1000 🪙</span>
+                  <input type="text" id="cfg-thread-tier1000" class="form-input" placeholder="Thread ID +1000 🪙">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: rgba(250, 153, 49, 0.2); color: #fa9931;">250-1000 🪙</span>
+                  <input type="text" id="cfg-thread-tier250" class="form-input" placeholder="Thread ID 250-1000 🪙">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: rgba(237, 111, 163, 0.2); color: #ed6fa3;">100-250 🪙</span>
+                  <input type="text" id="cfg-thread-tier100" class="form-input" placeholder="Thread ID 100-250 🪙">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: rgba(198, 167, 242, 0.2); color: #c6a7f2;">50-100 🪙</span>
+                  <input type="text" id="cfg-thread-tier50" class="form-input" placeholder="Thread ID 50-100 🪙">
+                </div>
+                <div class="thread-row">
+                  <span class="thread-badge" style="background: rgba(177, 207, 242, 0.2); color: #b1cff2;">0-50 🪙</span>
+                  <input type="text" id="cfg-thread-tier0" class="form-input" placeholder="Thread ID 0-50 🪙">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARTE TEMPORISATIONS BOT & CYCLES HUMAINS -->
+          <div class="config-card">
+            <div class="config-card-header">
+              <h3>Temporisations & Cycles Humains du Bot</h3>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Délais de Clics Bot (millisecondes)</label>
+              <div class="form-row-2col">
+                <div>
+                  <input type="number" id="cfg-min-click-delay" class="form-input" placeholder="Min (ms)" value="1500">
+                  <div class="form-hint">Délai minimum</div>
+                </div>
+                <div>
+                  <input type="number" id="cfg-max-click-delay" class="form-input" placeholder="Max (ms)" value="2200">
+                  <div class="form-hint">Délai maximum</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Temporisations entre Boosters (secondes)</label>
+              <div class="form-row-2col">
+                <div>
+                  <input type="number" step="0.1" id="cfg-min-booster-wait" class="form-input" placeholder="Min (sec)" value="2.0">
+                  <div class="form-hint">Attente min</div>
+                </div>
+                <div>
+                  <input type="number" step="0.1" id="cfg-max-booster-wait" class="form-input" placeholder="Max (sec)" value="4.0">
+                  <div class="form-hint">Attente max</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="form-label" style="margin-bottom: 0;">Gestion des Cycles Humains (Farm & Pauses)</span>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-human-cycles-toggle" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div id="cfg-human-cycles-settings">
+                <div class="form-row-2col" style="margin-bottom: 10px;">
+                  <div>
+                    <label class="form-label">Temps Actif Min (min)</label>
+                    <input type="number" id="cfg-min-active-min" class="form-input" value="35">
+                  </div>
+                  <div>
+                    <label class="form-label">Temps Actif Max (min)</label>
+                    <input type="number" id="cfg-max-active-min" class="form-input" value="50">
+                  </div>
+                </div>
+
+                <div class="form-row-2col">
+                  <div>
+                    <label class="form-label">Pause Min (min)</label>
+                    <input type="number" id="cfg-min-break-min" class="form-input" value="10">
+                  </div>
+                  <div>
+                    <label class="form-label">Pause Max (min)</label>
+                    <input type="number" id="cfg-max-break-min" class="form-input" value="25">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+              <button class="btn btn-primary" id="btn-save-discord-config" style="flex: 1;">
+                Enregistrer la Configuration
+              </button>
+            </div>
+          </div>
+
+          <!-- ACTIONS DE GESTION DES DONNÉES -->
+          <div class="config-card">
+            <div class="config-card-header">
+              <h3>Sauvegarde & Actions Globales</h3>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">
+              Exportez ou réinitialisez l'intégralité des données en mémoire locale du dashboard.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="btn btn-secondary" id="btn-export-data">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Exporter les Données en JSON
+              </button>
+
+              <button class="btn btn-danger" id="btn-reset-data">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Réinitialiser les Statistiques & Tirages
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           ONGLET 5 : LIAISON EXTENSION DIRECTE (externally_connectable)
+           ================================================================== -->
+      <section class="tab-pane" id="tab-bridge">
+        <div class="extension-bridge-card">
+          <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-bottom: 10px;">Liaison Directe Extension Chrome</h2>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+            Permet au dashboard de communiquer directement avec le Service Worker de l'extension via le protocole Chrome <code>externally_connectable</code> et <code>chrome.runtime.sendMessage</code>.
+          </p>
+
+          <div class="bridge-status-banner">
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Statut de Connexion</div>
+              <div style="font-weight: 700; font-size: 15px; color: #ffffff; display: flex; align-items: center; gap: 8px; margin-top: 3px;">
+                <span class="status-dot disconnected" id="header-status-dot"></span>
+                <span id="header-status-text">Déconnecté</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-extension-id">ID Unique de l'Extension Chrome (<code>chrome.runtime.id</code>)</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="input-extension-id" class="form-input" placeholder="Ex: efnmjlkgeebfkocflhbbpccohckckhbe">
+              <button class="btn btn-primary" id="btn-save-extension-id" style="flex-shrink: 0;">
+                Sauvegarder & Connecter
+              </button>
+            </div>
+            <div class="form-hint">
+              Trouvez cet ID dans <code>chrome://extensions</code> sous l'extension WikiMasters / WikiLogix en mode développeur.
+            </div>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <label class="form-label">Journal de Communication en Direct (Console Bridge)</label>
+            <div class="bridge-logs-box" id="bridge-log-console">
+              <!-- Logs temps réel -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ====================================================================
+       MODALE DÉTAIL DE CARTE HOLOGRAPHIQUE
+       ==================================================================== -->
+  <div class="modal-backdrop" id="card-detail-modal">
+    <div class="modal-card">
+      <div class="modal-header-gem">
+        <div>
+          <span class="rarity-badge" id="modal-card-badge">Légendaire</span>
+          <h2 class="modal-card-name" id="modal-card-name" style="margin-top: 6px;">Adèle Castillon</h2>
+        </div>
+        <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="hologram-preview-box" id="modal-hologram-box">
+          <div style="font-size: 36px; margin-bottom: 6px;">✨</div>
+          <div style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">
+            Carte WikiMasters Officielle
+          </div>
+        </div>
+
+        <p id="modal-card-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; font-style: italic;">
+          Description encyclopédique de la carte...
+        </p>
+
+        <div class="modal-stats-grid">
+          <div class="stat-cell">
+            <div class="stat-cell-label">Prix Moyen Marché</div>
+            <div class="stat-cell-value" id="modal-val-avg" style="color: var(--cyber-amber);">0 🪙</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-cell-label">Conseil Revente (50-75%)</div>
+            <div class="stat-cell-value" id="modal-val-resale" style="color: var(--cyber-emerald);">0 - 0 🪙</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-cell-label">Fourchette Marché (Min-Max)</div>
+            <div class="stat-cell-value" id="modal-val-market-range">0 - 0 🪙</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-cell-label">Stats Combat (ATK / DEF)</div>
+            <div class="stat-cell-value" id="modal-val-combat">⚔️ - / 🛡️ -</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-cell-label">Position Booster</div>
+            <div class="stat-cell-value" id="modal-val-booster-idx">Carte #1 sur 5</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-cell-label">Horodatage du Tirage</div>
+            <div class="stat-cell-value" id="modal-val-timestamp" style="font-size: 13px;">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENEUR DES TOASTS NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="./app.js"></script>
+</body>
+</html>

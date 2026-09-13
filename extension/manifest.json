@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "WikiLogix - Tracker & Prix",
+  "version": "1.6.0",
+  "description": "Suivi automatique des tirages, calcul des prix réels du marché et conseils de revente (50-75%) pour Wiki-Masters.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://discord.com/*",
+    "*://*.wiki-masters.com/*",
+    "*://wiki-masters.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.wiki-masters.com/*",
+        "*://wiki-masters.com/*"
+      ],
+      "js": [
+        "src/content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "WikiLogix - Tracker & Prix",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "externally_connectable": {
+    "matches": [
+      "*://localhost/*",
+      "*://127.0.0.1/*",
+      "*://*.wiki-masters.com/*",
+      "https://*/*"
+    ]
+  }
+}
