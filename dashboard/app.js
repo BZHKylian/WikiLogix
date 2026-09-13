@@ -2011,22 +2011,39 @@
   // 9. LIAISON DIRECTE EXTENSION CHROME (externally_connectable)
   // ==========================================================================
 
-  function syncWithExtension() {
+  let lastSyncedDataSignature = null;
+
+  function computeDataSignature(cards, boosters, discordConfig) {
+    const cardsLen = Array.isArray(cards) ? cards.length : 0;
+    const lastCard = Array.isArray(cards) && cards.length > 0 ? cards[cards.length - 1] : null;
+    const lastCardId = lastCard ? (lastCard.id || `${lastCard.name}_${lastCard.timestamp}`) : '';
+    const boostersLen = Array.isArray(boosters) ? boosters.length : 0;
+    const configStr = discordConfig ? JSON.stringify(discordConfig) : '';
+    return `${cardsLen}_${lastCardId}_${boostersLen}_${configStr}`;
+  }
+
+  function syncWithExtension(isManual = false) {
     const extId = state.extensionId.trim();
 
     if (!extId) {
-      showToast("Veuillez d'abord renseigner l'ID de l'extension Chrome.", 'danger');
+      if (isManual) {
+        showToast("Veuillez d'abord renseigner l'ID de l'extension Chrome.", 'danger');
+      }
       setConnectionStatus('disconnected');
       return;
     }
 
-    setConnectionStatus('syncing');
-    logBridgeMessage("Tentative de liaison avec l'extension (ID: " + extId + ")...", 'info');
+    if (isManual) {
+      setConnectionStatus('syncing');
+      logBridgeMessage("Tentative de liaison avec l'extension (ID: " + extId + ")...", 'info');
+    }
 
     if (typeof window.chrome === 'undefined' || !window.chrome.runtime || !window.chrome.runtime.sendMessage) {
-      logBridgeMessage("L'API 'chrome.runtime.sendMessage' n'est accessible que dans un environnement Chrome avec 'externally_connectable'.", 'warn');
+      if (isManual) {
+        logBridgeMessage("L'API 'chrome.runtime.sendMessage' n'est accessible que dans un environnement Chrome avec 'externally_connectable'.", 'warn');
+        showToast("Note : Exécutez le dashboard via localhost pour la liaison directe Chrome.", 'danger');
+      }
       setConnectionStatus('disconnected');
-      showToast("Note : Exécutez le dashboard via localhost pour la liaison directe Chrome.", 'danger');
       return;
     }
 
@@ -2037,33 +2054,62 @@
         (response) => {
           if (window.chrome.runtime.lastError) {
             const err = window.chrome.runtime.lastError.message;
-            logBridgeMessage('Échec de liaison : ' + err, 'error');
+            if (isManual) {
+              logBridgeMessage('Échec de liaison : ' + err, 'error');
+              showToast("Erreur d'extension : " + err, 'danger');
+            }
             setConnectionStatus('disconnected');
-            showToast("Erreur d'extension : " + err, 'danger');
             return;
           }
 
           if (response && response.success) {
-            handleSuccessfulSync(response.data || response);
+            handleSuccessfulSync(response.data || response, isManual);
           } else {
-            logBridgeMessage('Réponse négative reçue de l\'extension : ' + (response?.error || 'Inconnue'), 'warn');
+            if (isManual) {
+              logBridgeMessage('Réponse négative reçue de l\'extension : ' + (response?.error || 'Inconnue'), 'warn');
+            }
             setConnectionStatus('disconnected');
           }
         }
       );
     } catch (err) {
-      logBridgeMessage('Exception : ' + err.message, 'error');
+      if (isManual) {
+        logBridgeMessage('Exception : ' + err.message, 'error');
+      }
       setConnectionStatus('disconnected');
     }
   }
 
-  function handleSuccessfulSync(data) {
+  function handleSuccessfulSync(data, isManual = false) {
     setConnectionStatus('connected');
-    logBridgeMessage('Synchronisation réussie ! Données en direct reçues.', 'success');
-    showToast('Données synchronisées avec l\'extension !', 'success');
 
-    if (Array.isArray(data.cards) && data.cards.length > 0) {
-      state.cards = data.cards;
+    const incomingCards = Array.isArray(data.cards) ? data.cards : state.cards;
+    const incomingBoosters = Array.isArray(data.boosters) ? data.boosters : state.boosters;
+    const incomingConfig = data.discordConfig || null;
+
+    const signature = computeDataSignature(incomingCards, incomingBoosters, incomingConfig);
+
+    // Si aucune donnée n'a changé, ne recalcule rien et ne spamme pas !
+    if (signature === lastSyncedDataSignature) {
+      if (isManual) {
+        showToast('Données déjà à jour (aucun nouveau tirage)', 'info');
+        logBridgeMessage('Synchronisation manuelle : Données déjà à jour.', 'info');
+      }
+      return;
+    }
+
+    // Des changements ont été détectés
+    const previousCardsCount = state.cards.length;
+    lastSyncedDataSignature = signature;
+
+    let hasCardsChanged = false;
+    let hasConfigChanged = false;
+
+    if (Array.isArray(data.cards)) {
+      if (data.cards.length !== state.cards.length || JSON.stringify(data.cards) !== JSON.stringify(state.cards)) {
+        state.cards = data.cards;
+        hasCardsChanged = true;
+      }
     }
     if (Array.isArray(data.boosters)) {
       state.boosters = data.boosters;
@@ -2071,15 +2117,39 @@
     if (data.marketPrices) {
       state.marketPrices = data.marketPrices;
     }
+
     if (data.discordConfig) {
-      state.discordConfig = { ...state.discordConfig, ...data.discordConfig };
+      const oldCfgStr = JSON.stringify(state.discordConfig);
+      const newCfg = { ...state.discordConfig, ...data.discordConfig };
       if (Array.isArray(data.discordConfig.rules)) {
-        state.discordConfig.rules = data.discordConfig.rules;
+        newCfg.rules = data.discordConfig.rules;
       }
-      populateDiscordConfigForm();
+      const newCfgStr = JSON.stringify(newCfg);
+      if (oldCfgStr !== newCfgStr) {
+        state.discordConfig = newCfg;
+        hasConfigChanged = true;
+        const isUserTyping = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+        if (!isUserTyping) {
+          populateDiscordConfigForm();
+        }
+      }
     }
 
-    updateDashboardData();
+    // Mise à jour des calculs et graphiques uniquement lors d'un changement réel
+    if (hasCardsChanged || isManual) {
+      updateDashboardData();
+      const newCount = state.cards.length - previousCardsCount;
+      if (newCount > 0) {
+        logBridgeMessage(`Synchronisation : +${newCount} nouvelle(s) carte(s) reçue(s).`, 'success');
+        if (isManual) showToast(`Synchronisation : +${newCount} nouvelle(s) carte(s) !`, 'success');
+      } else {
+        if (isManual) showToast('Données synchronisées avec succès !', 'success');
+        logBridgeMessage('Données synchronisées avec l\'extension.', 'success');
+      }
+    } else if (hasConfigChanged) {
+      persistData();
+      logBridgeMessage('Configuration Discord mise à jour depuis l\'extension.', 'info');
+    }
   }
 
   function setConnectionStatus(status) {
@@ -2550,7 +2620,7 @@
   function initEventListeners() {
     const btnSyncManual = document.getElementById('btn-sync-now');
     if (btnSyncManual) {
-      btnSyncManual.addEventListener('click', () => syncWithExtension());
+      btnSyncManual.addEventListener('click', () => syncWithExtension(true));
     }
 
     const autoSyncToggle = document.getElementById('toggle-auto-sync');
@@ -2560,8 +2630,8 @@
         if (state.isAutoSyncActive) {
           logBridgeMessage('Synchronisation automatique activée (intervalle: 5s).', 'info');
           showToast('Synchronisation automatique activée', 'info');
-          syncWithExtension();
-          state.autoSyncInterval = setInterval(syncWithExtension, state.syncFrequencySec * 1000);
+          syncWithExtension(false);
+          state.autoSyncInterval = setInterval(() => syncWithExtension(false), state.syncFrequencySec * 1000);
         } else {
           if (state.autoSyncInterval) clearInterval(state.autoSyncInterval);
           state.autoSyncInterval = null;
@@ -2580,7 +2650,7 @@
           persistData();
           logBridgeMessage("ID de l'extension enregistré : " + state.extensionId, 'success');
           showToast('ID Extension sauvegardé !', 'success');
-          syncWithExtension();
+          syncWithExtension(true);
         }
       });
     }
@@ -2744,7 +2814,7 @@
     logBridgeMessage('Dashboard WikiMasters initialisé avec succès.', 'info');
 
     if (state.extensionId) {
-      syncWithExtension();
+      syncWithExtension(false);
     }
   }
 
