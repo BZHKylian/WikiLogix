@@ -17,7 +17,7 @@ import {
 } from './modules/storage.js';
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-  console.log(`[WikiLogix Background] Service Worker initialisé (v1.6.0 - Raison: ${details.reason})`);
+  console.log(`[WikiLogix Background] Service Worker initialisé (v1.6.4 - Raison: ${details.reason})`);
 
   const existingData = await getStorageData([
     STORAGE_KEYS.BOOSTERS,
@@ -109,7 +109,9 @@ async function sendCardToDiscord(cardData, customConfig = null) {
 
     const normRarity = normalizeRarity(cardData.rarity);
     const meta = RARITY_CONFIG[normRarity] || RARITY_CONFIG.C;
-    const avgPrice = Number(cardData.avgPrice) > 0 ? Number(cardData.avgPrice) : 0;
+    const avgPrice = Number(cardData.avgPrice) > 0 
+      ? Number(cardData.avgPrice) 
+      : (Number(cardData.suggestedPrice) > 0 ? Math.round(Number(cardData.suggestedPrice) / 0.625) : (Number(cardData.minPrice) || Number(cardData.lastPrice) || 0));
     const sellMin = Math.round(avgPrice * 0.50);
     const sellMax = Math.round(avgPrice * 0.75);
 
@@ -284,6 +286,50 @@ async function sendDiscordTestWebhook({ webhookUrl, threadId, discordUserId, rul
   return true;
 }
 
+/**
+ * Déclenche une notification push native desktop avec le prix moyen et la revente conseillée
+ */
+function triggerNativeNotification(cardData) {
+  if (typeof chrome === 'undefined' || !chrome.notifications || !chrome.notifications.create) return;
+  try {
+    const { name, rarity } = cardData;
+    const normRarity = normalizeRarity(rarity);
+    const meta = RARITY_CONFIG[normRarity] || RARITY_CONFIG.C;
+    const avgPrice = Number(cardData.avgPrice) > 0 
+      ? Number(cardData.avgPrice) 
+      : (Number(cardData.suggestedPrice) > 0 ? Math.round(Number(cardData.suggestedPrice) / 0.625) : (Number(cardData.minPrice) || Number(cardData.lastPrice) || 0));
+    const sellMin = Math.round(avgPrice * 0.50);
+    const sellMax = Math.round(avgPrice * 0.75);
+
+    const isMajor = normRarity === 'L' || normRarity === 'UR' || normRarity === 'SR' || avgPrice >= 50;
+    // Éviter de saturer Windows si c'est une simple commune à 0 vente
+    if (!isMajor && avgPrice === 0) return;
+
+    const displayAvg = avgPrice > 0 ? `${avgPrice.toLocaleString('fr-FR')} 🪙` : 'Non cotée';
+    const displayResale = avgPrice > 0 ? `${sellMin.toLocaleString('fr-FR')} - ${sellMax.toLocaleString('fr-FR')} 🪙` : 'À fixer';
+
+    const notifId = 'wikilogix_drop_' + Date.now();
+    chrome.notifications.create(notifId, {
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: `🎴 WikiLogix : ${name || 'Carte'} [${meta.shortCode} - ${meta.label}]`,
+      message: `• Prix Moyen : ${displayAvg}\n• Revente (50-75%) : ${displayResale}`,
+      priority: 1
+    }, () => {
+      if (chrome.runtime.lastError) {}
+    });
+
+    // Auto-fermeture après 4.5 secondes
+    setTimeout(() => {
+      try {
+        chrome.notifications.clear(notifId);
+      } catch (_) {}
+    }, 4500);
+  } catch (err) {
+    console.warn('[WikiLogix Background] Notification native non disponible :', err);
+  }
+}
+
 // Réception des messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || !message.type) return false;
@@ -301,6 +347,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const result = await recordCardInSession(message.payload, {
             url: sender.tab?.url || message.payload.url || 'https://www.wiki-masters.com/pulls'
           });
+          triggerNativeNotification(message.payload);
           await updateExtensionBadge();
           sendResponse({ success: true, result });
           break;
@@ -315,6 +362,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         case 'SEND_DISCORD_NOTIFICATION': {
           const result = await sendCardToDiscord(message.payload);
+          // Déclencher aussi la notification push native (fix bug prix=0 dans push)
+          triggerNativeNotification(message.payload);
           sendResponse({ success: true, result });
           break;
         }
@@ -352,6 +401,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         case 'CLEAR_HISTORY': {
           await clearHistory();
           await updateExtensionBadge();
+          // Informer tous les onglets ouverts de purger leurs caches mémoires et fermer les notifications
+          try {
+            chrome.tabs.query({}, (tabs) => {
+              if (Array.isArray(tabs)) {
+                tabs.forEach((tab) => {
+                  if (tab.id) {
+                    chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_LOCAL_CACHE' }).catch(() => {});
+                  }
+                });
+              }
+            });
+          } catch (_) {}
           sendResponse({ success: true });
           break;
         }
@@ -381,7 +442,7 @@ if (chrome.runtime.onMessageExternal) {
       try {
         if (!message) return;
         if (message.type === 'PING' || message.action === 'ping') {
-          sendResponse({ success: true, version: '1.6.0', extensionId: chrome.runtime.id });
+          sendResponse({ success: true, version: '1.6.3', extensionId: chrome.runtime.id });
         } else if (message.type === 'FETCH_STATS' || message.type === 'GET_STATS' || message.action === 'getWikiMastersData') {
           const stats = await getStats();
           const rawCards = (await getStorageData([STORAGE_KEYS.CARDS]))[STORAGE_KEYS.CARDS] || [];

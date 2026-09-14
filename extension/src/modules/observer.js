@@ -50,7 +50,7 @@ export function extractCurrentCardData(rootNode = document) {
   );
 
   for (const container of cardContainers) {
-    if (container.closest('.card-frame, [class*="card-frame"], div[role="dialog"], div[data-protonpass-form]')) {
+    if (container.closest('div[role="dialog"], div[data-protonpass-form]')) {
       continue;
     }
 

@@ -492,14 +492,51 @@ export async function recordCardInSession(cardData, metadata = {}) {
  * Calcule l'intégralité des statistiques globales, taux et valeurs financières
  */
 export async function getStats() {
-  const data = await getStorageData([STORAGE_KEYS.BOOSTERS, STORAGE_KEYS.CARDS, STORAGE_KEYS.MARKET_PRICES]);
+  const data = await getStorageData([
+    STORAGE_KEYS.BOOSTERS,
+    STORAGE_KEYS.CARDS,
+    STORAGE_KEYS.MARKET_PRICES,
+    'pulledCardsHistory',
+    'totalCardsCount',
+    'totalPacksCount',
+    'rarityCounts',
+    'totalSessionStats'
+  ]);
+
   let boosters = data[STORAGE_KEYS.BOOSTERS] || [];
   let rawCards = data[STORAGE_KEYS.CARDS] || [];
   let cards = rawCards.filter((c) => isValidCardName(c.name));
   const marketCache = data[STORAGE_KEYS.MARKET_PRICES] || {};
+  const pulledHistory = Array.isArray(data.pulledCardsHistory) ? data.pulledCardsHistory : [];
+
+  // Rétrocompatibilité : si wikilogix_cards_history est vide mais pulledCardsHistory contient des données
+  if (cards.length === 0 && pulledHistory.length > 0) {
+    cards = pulledHistory
+      .filter((item) => item && isValidCardName(item.name))
+      .map((item, idx) => {
+        const normR = normalizeRarity(item.rarity);
+        const pAvg = Number(item.avgPrice) || Number(item.suggestedPrice) || Number(item.minPrice) || Number(item.lastPrice) || 0;
+        return {
+          id: `legacy_card_${idx}_${Date.now()}`,
+          name: item.name.trim(),
+          rarity: normR,
+          rawRarity: item.rarity,
+          avgPrice: pAvg,
+          suggestedPrice: Number(item.suggestedPrice) || Math.round(pAvg * 0.50),
+          sellPriceMin: Math.round(pAvg * 0.50),
+          sellPriceMax: Math.round(pAvg * 0.75),
+          sellPriceMid: Math.round(pAvg * 0.625),
+          minPrice: Number(item.minPrice) || pAvg,
+          maxPrice: Number(item.maxPrice) || pAvg,
+          lastPrice: Number(item.lastPrice) || pAvg,
+          imageUrl: item.imageUrl || null,
+          timestamp: Date.now() - (pulledHistory.length - idx) * 60000
+        };
+      });
+  }
 
   // Purge immédiate et automatique des faux tags enregistrés précédemment
-  if (cards.length !== rawCards.length) {
+  if (cards.length !== rawCards.length && rawCards.length > 0) {
     boosters.forEach((b) => {
       if (Array.isArray(b.cards)) {
         b.cards = b.cards.filter((c) => isValidCardName(c.name));
@@ -512,8 +549,8 @@ export async function getStats() {
     }).catch(() => {});
   }
 
-  const totalCards = cards.length;
-  const totalBoosters = Math.max(boosters.length, totalCards > 0 ? Math.ceil(totalCards / 5) : 0);
+  const totalCards = Math.max(cards.length, Number(data.totalCardsCount) || 0, pulledHistory.length);
+  const totalBoosters = Math.max(boosters.length, Number(data.totalPacksCount) || 0, totalCards > 0 ? Math.ceil(totalCards / 5) : 0);
 
   let totalAverageValue = 0;
   let totalSellValueMin = 0;
@@ -539,6 +576,15 @@ export async function getStats() {
     if (!realPrice && Number(card.avgPrice) > 0) {
       realPrice = Number(card.avgPrice);
     }
+    if (!realPrice && Number(card.suggestedPrice) > 0) {
+      realPrice = Math.round(Number(card.suggestedPrice) / 0.625);
+    }
+    if (!realPrice && Number(card.minPrice) > 0) {
+      realPrice = Number(card.minPrice);
+    }
+    if (!realPrice && Number(card.lastPrice) > 0) {
+      realPrice = Number(card.lastPrice);
+    }
 
     if (realPrice > 0) {
       realMarketCardsCount++;
@@ -553,6 +599,16 @@ export async function getStats() {
     totalSellValueMax += maxP;
     rarityValues[r] = (rarityValues[r] || 0) + avgP;
   });
+
+  // Si des compteurs de rareté globaux existent dans storage
+  if (data.rarityCounts && typeof data.rarityCounts === 'object') {
+    Object.entries(data.rarityCounts).forEach(([rName, cnt]) => {
+      const code = normalizeRarity(rName);
+      if (rarityCounts[code] !== undefined && cnt > rarityCounts[code]) {
+        rarityCounts[code] = cnt;
+      }
+    });
+  }
 
   const rarityBreakdown = {};
   rarityOrder.forEach((rCode) => {
@@ -586,7 +642,36 @@ export async function getStats() {
 
   const recentCards = [...cards]
     .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-    .slice(0, 25);
+    .slice(0, 25)
+    .map((card) => {
+      const cleanName = (card.name || '').trim().toLowerCase();
+      const r = normalizeRarity(card.rarity);
+      const cached = marketCache[cleanName] || marketCache[`${cleanName}__${r}`];
+      
+      let p = (cached && Number(cached.avgPrice) > 0) ? Number(cached.avgPrice) : (Number(card.avgPrice) || 0);
+      if (!p && Number(card.suggestedPrice) > 0) {
+        p = Math.round(Number(card.suggestedPrice) / 0.625);
+      }
+      if (!p && Number(card.minPrice) > 0) {
+        p = Number(card.minPrice);
+      }
+      if (!p && Number(card.lastPrice) > 0) {
+        p = Number(card.lastPrice);
+      }
+
+      return {
+        ...card,
+        avgPrice: p,
+        suggestedPrice: Number(card.suggestedPrice) || (p > 0 ? Math.round(p * 0.50) : 0),
+        sellPriceMin: p > 0 ? (Number(card.sellPriceMin) || Math.round(p * 0.50)) : 0,
+        sellPriceMax: p > 0 ? (Number(card.sellPriceMax) || Math.round(p * 0.75)) : 0,
+        sellPriceMid: p > 0 ? (Number(card.sellPriceMid) || Math.round(p * 0.625)) : 0,
+        minPrice: (cached && Number(cached.minPrice) > 0) ? Number(cached.minPrice) : (card.minPrice || p),
+        maxPrice: (cached && Number(cached.maxPrice) > 0) ? Number(cached.maxPrice) : (card.maxPrice || p),
+        lastPrice: (cached && Number(cached.lastPrice) > 0) ? Number(cached.lastPrice) : (card.lastPrice || p),
+        hasRealMarketPrice: p > 0
+      };
+    });
 
   return {
     totalBoosters,
@@ -618,16 +703,43 @@ export async function getStats() {
 }
 
 /**
- * Réinitialise l'historique complet
+ * Réinitialise l'historique complet et purge toutes les clés de stockage
  */
 export async function clearHistory() {
   return enqueueStorageTask(async () => {
-    await setStorageData({
+    const keysToReset = {
       [STORAGE_KEYS.BOOSTERS]: [],
       [STORAGE_KEYS.CARDS]: [],
       [STORAGE_KEYS.ACTIVE_SESSION]: null,
-      [STORAGE_KEYS.MARKET_PRICES]: {}
-    });
+      [STORAGE_KEYS.MARKET_PRICES]: {},
+      pulledCardsHistory: [],
+      totalCardsCount: 0,
+      totalPacksCount: 0,
+      rarityCounts: {
+        'Commune': 0,
+        'Peu commune': 0,
+        'Rare': 0,
+        'Super rare': 0,
+        'Ultra rare': 0,
+        'Légendaire': 0
+      },
+      totalSessionStats: { packsOpened: 0, cardsPulled: 0, cards: [] },
+      botLiveStatus: null
+    };
+
+    await setStorageData(keysToReset);
+
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      await new Promise((res) => {
+        chrome.storage.local.set(keysToReset, res);
+      });
+    }
+
+    if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
+      try {
+        chrome.action.setBadgeText({ text: '' });
+      } catch (_) {}
+    }
   });
 }
 

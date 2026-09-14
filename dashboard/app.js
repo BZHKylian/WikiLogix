@@ -2013,13 +2013,15 @@
 
   let lastSyncedDataSignature = null;
 
-  function computeDataSignature(cards, boosters, discordConfig) {
+  function computeDataSignature(cards, boosters, discordConfig, marketPrices) {
     const cardsLen = Array.isArray(cards) ? cards.length : 0;
+    const totalPrice = Array.isArray(cards) ? cards.reduce((acc, c) => acc + (Number(c.avgPrice) || 0), 0) : 0;
     const lastCard = Array.isArray(cards) && cards.length > 0 ? cards[cards.length - 1] : null;
     const lastCardId = lastCard ? (lastCard.id || `${lastCard.name}_${lastCard.timestamp}`) : '';
     const boostersLen = Array.isArray(boosters) ? boosters.length : 0;
     const configStr = discordConfig ? JSON.stringify(discordConfig) : '';
-    return `${cardsLen}_${lastCardId}_${boostersLen}_${configStr}`;
+    const marketLen = marketPrices ? Object.keys(marketPrices).length : 0;
+    return `${cardsLen}_${totalPrice}_${lastCardId}_${boostersLen}_${marketLen}_${configStr}`;
   }
 
   function syncWithExtension(isManual = false) {
@@ -2085,9 +2087,9 @@
 
     const incomingCards = Array.isArray(data.cards) ? data.cards : state.cards;
     const incomingBoosters = Array.isArray(data.boosters) ? data.boosters : state.boosters;
-    const incomingConfig = data.discordConfig || null;
-
-    const signature = computeDataSignature(incomingCards, incomingBoosters, incomingConfig);
+    const incomingConfig = data.discordConfig || state.discordConfig || null;
+    const incomingMarketPrices = data.marketPrices || state.marketPrices || null;
+    const signature = computeDataSignature(incomingCards, incomingBoosters, incomingConfig, incomingMarketPrices);
 
     // Si aucune donnée n'a changé, ne recalcule rien et ne spamme pas !
     if (signature === lastSyncedDataSignature) {
@@ -2473,7 +2475,10 @@
                     { name: 'Fourchette Prix', value: priceDesc, inline: true },
                     { name: 'Statut Règle', value: rule.enabled !== false ? '✅ Active' : '⏸️ Désactivée', inline: true }
                   ],
-                  footer: { text: 'WikiMasters Dynamic Rule Engine • Dashboard Pro' },
+                  footer: { 
+                    text: 'WikiLogix Dynamic Rule Engine • Dashboard Pro',
+                    icon_url: 'https://i.imgur.com/MUpcyUn.jpeg'
+                  },
                   timestamp: new Date().toISOString()
                 }
               ]
@@ -2696,7 +2701,10 @@
                 { name: 'Filtres Personnalisés', value: `${(state.discordConfig.rules || []).length} règle(s) active(s)`, inline: true },
                 { name: 'Conseils Revente', value: 'Calculés automatiquement à 50% - 75%', inline: false }
               ],
-              footer: { text: 'WikiMasters Dashboard Tracker' },
+              footer: { 
+                text: 'WikiLogix Dashboard Tracker',
+                icon_url: 'https://i.imgur.com/MUpcyUn.jpeg'
+              },
               timestamp: new Date().toISOString()
             }
           ]

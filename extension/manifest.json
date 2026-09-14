@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "WikiLogix - Tracker & Prix",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Suivi automatique des tirages, calcul des prix réels du marché et conseils de revente (50-75%) pour Wiki-Masters.",
   "permissions": [
-    "storage"
+    "storage",
+    "notifications"
   ],
   "host_permissions": [
     "https://discord.com/*",
