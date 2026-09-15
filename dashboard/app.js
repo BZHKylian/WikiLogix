@@ -1703,6 +1703,14 @@
 
     renderCardsTable();
     persistData();
+
+    // Mettre à jour les KPIs de l'onglet Accueil
+    const homeKpiCards = document.getElementById('home-kpi-cards');
+    const homeKpiBoosters = document.getElementById('home-kpi-boosters');
+    const homeKpiValue = document.getElementById('home-kpi-value');
+    if (homeKpiCards) homeKpiCards.textContent = stats.totalCards.toLocaleString('fr-FR');
+    if (homeKpiBoosters) homeKpiBoosters.textContent = stats.totalBoosters.toLocaleString('fr-FR');
+    if (homeKpiValue) homeKpiValue.textContent = stats.totalEstimatedValue.toLocaleString('fr-FR') + ' 🪙';
   }
 
   // ==========================================================================
@@ -1725,6 +1733,23 @@
         const targetPane = document.getElementById(targetTabId);
         if (targetPane) {
           targetPane.classList.add('active');
+        }
+
+        // Adapter le titre du header
+        const titleEl = document.getElementById('main-page-title');
+        const subEl = document.getElementById('main-page-subtitle');
+        const TITLES = {
+          'tab-home':     { t: 'Bienvenue sur WikiLogix', s: 'Votre assistant intelligent pour WikiMasters' },
+          'tab-overview': { t: 'Centre de Contrôle WikiLogix', s: 'Supervision des tirages, analyse financière & configuration miroir' },
+          'tab-charts':   { t: 'Analyses Graphiques', s: 'Visualisation avancée de vos données de farm' },
+          'tab-cards':    { t: 'Historique des Cartes', s: 'Gérez et suivez l\'intégralité de votre collection' },
+          'tab-config':   { t: 'Miroir Bot & Discord', s: 'Configuration des notifications et filtres de routage' },
+          'tab-bridge':   { t: 'Liaison Extension', s: 'Connexion directe au Service Worker de l\'extension' },
+          'tab-guide':    { t: 'Guide & Documentation', s: 'Tout ce qu\'il faut savoir pour utiliser WikiLogix' }
+        };
+        if (TITLES[targetTabId]) {
+          if (titleEl) titleEl.textContent = TITLES[targetTabId].t;
+          if (subEl) subEl.textContent = TITLES[targetTabId].s;
         }
 
         setTimeout(() => {
@@ -1866,11 +1891,21 @@
         : '--';
 
       const tr = document.createElement('tr');
+      if (card.status === 'sold' || card.status === 'traded') {
+        tr.style.opacity = '0.7';
+      }
+
+      const statusBadge = card.status === 'sold'
+        ? '<span class="card-status-badge sold tag-sold">🏷️ Vendu</span>'
+        : card.status === 'traded'
+          ? '<span class="card-status-badge traded tag-traded">🔄 Échangé</span>'
+          : '';
+
       tr.innerHTML = `
         <td>
           <div class="table-card-title">
             <span class="gem-dot" style="background: ${meta.color}; box-shadow: 0 0 8px ${meta.glowColor};"></span>
-            <strong>${card.name}</strong>
+            <strong>${card.name}</strong>${statusBadge}
           </div>
         </td>
         <td>
@@ -1967,9 +2002,14 @@
   // 8. MODALE DÉTAIL CARTE
   // ==========================================================================
 
+  // Références globales pour la modale
+  let _currentModalCard = null;
+
   function openCardDetailModal(card) {
     const modal = document.getElementById('card-detail-modal');
     if (!modal) return;
+
+    _currentModalCard = card;
 
     const meta = OFFICIAL_RARITIES[card.rarity] || OFFICIAL_RARITIES.C;
     const avgPrice = Number(card.avgPrice || card.suggestedPrice || 0);
@@ -1992,6 +2032,41 @@
     holoBox.style.borderColor = meta.borderColor;
     holoBox.style.boxShadow = '0 0 25px ' + meta.glowColor;
 
+    // --- IMAGE DE LA CARTE ---
+    const imgEl = document.getElementById('modal-card-img');
+    const placeholderEl = document.getElementById('modal-card-placeholder');
+    const imageUrl = card.imageUrl || card.image || null;
+    const isWikimastersDefault = imageUrl && (
+      imageUrl.includes('wiki-masters.com') ||
+      imageUrl.includes('/icon') ||
+      imageUrl.endsWith('.png') && (imageUrl.includes('commun') || imageUrl.includes('rare') || imageUrl.includes('legendaire'))
+    );
+
+    if (imgEl && placeholderEl) {
+      if (imageUrl && !isWikimastersDefault) {
+        imgEl.src = imageUrl;
+        imgEl.alt = card.name;
+        imgEl.style.display = 'block';
+        placeholderEl.style.display = 'none';
+        imgEl.onerror = function() {
+          imgEl.style.display = 'none';
+          placeholderEl.style.display = 'flex';
+        };
+      } else {
+        imgEl.style.display = 'none';
+        placeholderEl.style.display = 'flex';
+      }
+    }
+
+    // --- LIEN WIKIPEDIA ---
+    const wikiLinkEl = document.getElementById('modal-wiki-link');
+    if (wikiLinkEl) {
+      const wikiUrl = card.wikiUrl ||
+        'https://fr.wikipedia.org/wiki/' + encodeURIComponent((card.name || '').replace(/ /g, '_'));
+      wikiLinkEl.href = wikiUrl;
+      wikiLinkEl.style.display = 'inline-flex';
+    }
+
     document.getElementById('modal-val-avg').textContent = avgPrice.toLocaleString('fr-FR') + ' 🪙';
     document.getElementById('modal-val-resale').textContent = minSell.toLocaleString('fr-FR') + ' - ' + maxSell.toLocaleString('fr-FR') + ' 🪙';
     document.getElementById('modal-val-market-range').textContent = minPrice.toLocaleString('fr-FR') + ' - ' + maxPrice.toLocaleString('fr-FR') + ' 🪙';
@@ -1999,12 +2074,59 @@
     document.getElementById('modal-val-booster-idx').textContent = 'Carte #' + (card.cardIndex || 1) + ' sur ' + (card.totalInBooster || 5);
     document.getElementById('modal-val-timestamp').textContent = card.timestamp ? new Date(card.timestamp).toLocaleString('fr-FR') : '--';
 
+    // --- BOUTONS D'ACTIONS : état selon le statut actuel ---
+    const btnSold = document.getElementById('modal-btn-sold');
+    const btnTraded = document.getElementById('modal-btn-traded');
+    if (btnSold) {
+      btnSold.classList.toggle('active', card.status === 'sold');
+      btnSold.textContent = '';
+      btnSold.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg> ${card.status === 'sold' ? '✓ Vendu' : '🏷️ Vendu'}`;
+    }
+    if (btnTraded) {
+      btnTraded.classList.toggle('active', card.status === 'traded');
+      btnTraded.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.99 4.7L4 8.5l3.99 3.8V9.5H15v-2H7.99V4.7zm8.02 9.1v2.8H9v2H16.01V21l3.99-3.8-3.99-3.8v2.7z"/></svg> ${card.status === 'traded' ? '✓ Échangé' : '🔄 Échangé'}`;
+    }
+
     modal.classList.add('active');
   }
 
   function closeCardDetailModal() {
     const modal = document.getElementById('card-detail-modal');
     if (modal) modal.classList.remove('active');
+    _currentModalCard = null;
+  }
+
+  function markCardStatus(cardId, status) {
+    const card = state.cards.find((c) => c.id === cardId);
+    if (!card) return;
+
+    // Toggle : si le statut est déjà appliqué, on l'enlève
+    if (card.status === status) {
+      card.status = null;
+      showToast('Tag retiré.', 'info');
+    } else {
+      card.status = status;
+      const label = status === 'sold' ? 'Carte marquée comme Vendue' : 'Carte marquée comme Échangée';
+      showToast(label + ' 🏷️', 'success');
+    }
+
+    persistData();
+    renderCardsTable();
+    // Ré-ouvrir la modale avec les nouvelles données
+    openCardDetailModal(card);
+  }
+
+  function deleteCard(cardId) {
+    const card = state.cards.find((c) => c.id === cardId);
+    if (!card) return;
+
+    if (!confirm('Supprimer définitivement la carte "' + card.name + '" du cache ?')) return;
+
+    state.cards = state.cards.filter((c) => c.id !== cardId);
+    persistData();
+    updateDashboardData();
+    closeCardDetailModal();
+    showToast('Carte "' + card.name + '" supprimée.', 'info');
   }
 
   // ==========================================================================
@@ -2775,6 +2897,28 @@
     if (modalBackdrop) {
       modalBackdrop.addEventListener('click', (e) => {
         if (e.target === modalBackdrop) closeCardDetailModal();
+      });
+    }
+
+    // Boutons d'actions de la modale
+    const btnSold = document.getElementById('modal-btn-sold');
+    if (btnSold) {
+      btnSold.addEventListener('click', () => {
+        if (_currentModalCard) markCardStatus(_currentModalCard.id, 'sold');
+      });
+    }
+
+    const btnTraded = document.getElementById('modal-btn-traded');
+    if (btnTraded) {
+      btnTraded.addEventListener('click', () => {
+        if (_currentModalCard) markCardStatus(_currentModalCard.id, 'traded');
+      });
+    }
+
+    const btnDelete = document.getElementById('modal-btn-delete');
+    if (btnDelete) {
+      btnDelete.addEventListener('click', () => {
+        if (_currentModalCard) deleteCard(_currentModalCard.id);
       });
     }
   }

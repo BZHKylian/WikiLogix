@@ -27,6 +27,10 @@
       </div>
 
       <nav class="nav-menu">
+        <a class="nav-item" data-tab="tab-home" id="nav-home">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          Accueil
+        </a>
         <a class="nav-item active" data-tab="tab-overview" id="nav-overview">
           <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
           Vue d'ensemble
@@ -41,11 +45,15 @@
         </a>
         <a class="nav-item" data-tab="tab-config" id="nav-config">
           <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          Miroir Bot & Discord
+          Miroir Bot &amp; Discord
         </a>
         <a class="nav-item" data-tab="tab-bridge" id="nav-bridge">
           <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 7h-4v2h4c1.65 0 3 1.35 3 3s-1.35 3-3 3h-4v2h4c2.76 0 5-2.24 5-5s-2.24-5-5-5zm-6 8H7c-1.65 0-3-1.35-3-3s1.35-3 3-3h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-2zm-3-4h8v2H8z"/></svg>
           Liaison Extension
+        </a>
+        <a class="nav-item" data-tab="tab-guide" id="nav-guide">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+          Guide &amp; Aide
         </a>
       </nav>
 
@@ -68,8 +76,8 @@
       <!-- TOP HEADER BAR -->
       <header class="top-header">
         <div class="header-title-group">
-          <h1>Centre de Contrôle WikiLogix</h1>
-          <p>Supervision des tirages, analyse financière en temps réel & configuration miroir</p>
+          <h1 id="main-page-title">Centre de Contrôle WikiLogix</h1>
+          <p id="main-page-subtitle">Supervision des tirages, analyse financière en temps réel &amp; configuration miroir</p>
         </div>
 
         <div class="header-actions">
@@ -91,6 +99,102 @@
           </button>
         </div>
       </header>
+
+      <!-- ==================================================================
+           ONGLET 0 : ACCUEIL
+           ================================================================== -->
+      <section class="tab-pane" id="tab-home">
+        <!-- HERO -->
+        <div class="home-hero">
+          <img src="./assets/logo.png" alt="WikiLogix Logo" class="home-hero-logo" onerror="this.style.display='none'">
+          <h2>WikiLogix PRO</h2>
+          <p class="home-hero-tagline">
+            L'extension Chrome intelligente pour automatiser l'ouverture de boosters sur <strong>Wiki-Masters</strong>, tracker vos cartes et analyser vos gains en temps réel.
+          </p>
+          <span class="home-hero-badge">Extension Chrome · Version Active</span>
+        </div>
+
+        <!-- KPIs LIVE -->
+        <div style="padding: 0 24px;">
+          <p class="home-section-title">📊 Vos Stats en Direct</p>
+          <p class="home-section-sub">Données issues de votre cache local, synchronisées avec l'extension.</p>
+          <div class="home-kpi-strip">
+            <div class="home-kpi-item">
+              <div class="kpi-value" id="home-kpi-cards">0</div>
+              <div class="kpi-label">🎴 Cartes collectées</div>
+            </div>
+            <div class="home-kpi-item">
+              <div class="kpi-value" id="home-kpi-boosters">0</div>
+              <div class="kpi-label">📦 Boosters ouverts</div>
+            </div>
+            <div class="home-kpi-item">
+              <div class="kpi-value" id="home-kpi-value">0 🪙</div>
+              <div class="kpi-label">💰 Valeur estimée</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FONCTIONNALITÉS -->
+        <div style="padding: 0 24px;">
+          <p class="home-section-title">⚡ Fonctionnalités Clés</p>
+          <p class="home-section-sub">Tout ce dont vous avez besoin pour optimiser votre farm WikiMasters.</p>
+          <div class="features-grid">
+            <div class="feature-card" style="--feature-color: #06b6d4;">
+              <span class="feature-icon">🤖</span>
+              <h4>Farm Automatique</h4>
+              <p>Ouverture automatique de boosters en continu avec protection anti-spam intégrée.</p>
+            </div>
+            <div class="feature-card" style="--feature-color: #ffe144;">
+              <span class="feature-icon">🪙</span>
+              <h4>Prix du Marché</h4>
+              <p>Récupération des prix réels du marché WikiMasters pour chaque carte tirée.</p>
+            </div>
+            <div class="feature-card" style="--feature-color: #5865F2;">
+              <span class="feature-icon">📡</span>
+              <h4>Notifications Discord</h4>
+              <p>Embeds Discord automatiques pour chaque drop, avec filtres et routage par fils.</p>
+            </div>
+            <div class="feature-card" style="--feature-color: #ed6fa3;">
+              <span class="feature-icon">📈</span>
+              <h4>Dashboard Analytique</h4>
+              <p>Visualisez vos gains, la distribution des raretés et les KPIs financiers en temps réel.</p>
+            </div>
+            <div class="feature-card" style="--feature-color: #10b981;">
+              <span class="feature-icon">🗂️</span>
+              <h4>Historique Complet</h4>
+              <p>Consultez, filtrez et gérez l'intégralité de vos cartes avec statuts vendu/échangé.</p>
+            </div>
+            <div class="feature-card" style="--feature-color: #8b5cf6;">
+              <span class="feature-icon">🔗</span>
+              <h4>Liaison Extension</h4>
+              <p>Synchronisation directe via <code style="font-family:monospace;font-size:11px;background:rgba(139,92,246,.15);color:#8b5cf6;padding:1px 5px;border-radius:3px;">externally_connectable</code> Chrome.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- DÉMARRAGE -->
+        <div style="padding: 0 24px 32px;">
+          <p class="home-section-title">🚀 Comment Démarrer ?</p>
+          <p class="home-section-sub">3 étapes simples pour commencer à farmer.</p>
+          <div class="steps-grid">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <h4>Installer l'Extension</h4>
+              <p>Chargez l'extension WikiLogix dans Chrome via <strong>chrome://extensions</strong> en mode développeur.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <h4>Configurer le Dashboard</h4>
+              <p>Renseignez l'ID de l'extension dans l'onglet <em>Liaison Extension</em> pour activer la synchronisation.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <h4>Lancer le Farm</h4>
+              <p>Sur Wiki-Masters, ouvrez un booster — l'extension détecte et enregistre automatiquement chaque carte.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- ==================================================================
            ONGLET 1 : VUE D'ENSEMBLE (KPIs & RÉSUMÉ)
@@ -463,7 +567,155 @@
       </section>
 
       <!-- ==================================================================
-           ONGLET 5 : LIAISON EXTENSION DIRECTE (externally_connectable)
+           ONGLET 5 : GUIDE & AIDE
+           ================================================================== -->
+      <section class="tab-pane" id="tab-guide">
+        <!-- EN-TÊTE -->
+        <div style="padding: 32px 0 24px; text-align: center;">
+          <h2 style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:var(--text-primary);margin-bottom:8px;">📖 Guide &amp; Documentation</h2>
+          <p style="font-size:14px;color:var(--text-muted);max-width:500px;margin:0 auto;">Tout ce qu'il faut savoir pour installer, configurer et utiliser WikiLogix au maximum.</p>
+        </div>
+
+        <!-- INSTALLATION -->
+        <div class="guide-section">
+          <div class="guide-section-header">
+            <div class="guide-section-icon" style="background:rgba(6,182,212,0.1);">🔧</div>
+            <h3>Installation &amp; Configuration</h3>
+          </div>
+          <div class="guide-steps-list">
+            <div class="guide-step">
+              <div class="guide-step-num">1</div>
+              <div class="guide-step-content">
+                <h4>Télécharger l'extension</h4>
+                <p>Clonez ou téléchargez le dépôt GitHub <code>bzhkylian/WikiLogix</code>. Le dossier <code>extension/</code> contient tous les fichiers nécessaires.</p>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">2</div>
+              <div class="guide-step-content">
+                <h4>Charger dans Chrome</h4>
+                <p>Ouvrez <code>chrome://extensions</code>, activez le <strong>Mode développeur</strong> (haut droite), puis cliquez sur <strong>Charger l'extension non empaquetée</strong> et sélectionnez le dossier <code>extension/</code>.</p>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">3</div>
+              <div class="guide-step-content">
+                <h4>Copier l'ID de l'extension</h4>
+                <p>Sur la page <code>chrome://extensions</code>, copiez l'ID affiché sous WikiLogix (ex: <code>efnmjlkgeebfkocflhbbpccohckckhbe</code>) et collez-le dans l'onglet <em>Liaison Extension</em> du dashboard.</p>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">4</div>
+              <div class="guide-step-content">
+                <h4>Se rendre sur Wiki-Masters</h4>
+                <p>Naviguez vers <code>wiki-masters.com/pulls</code>. L'extension s'active automatiquement et l'icône WikiLogix s'allume dans la barre Chrome.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FONCTIONNEMENT -->
+        <div class="guide-section">
+          <div class="guide-section-header">
+            <div class="guide-section-icon" style="background:rgba(255,225,68,0.1);">⚙️</div>
+            <h3>Comment ça fonctionne ?</h3>
+          </div>
+          <div class="guide-feature-grid">
+            <div class="guide-feature-item">
+              <span class="fi-icon">👁️</span>
+              <div>
+                <h4>Détection des Cartes</h4>
+                <p>Un <em>MutationObserver</em> surveille le DOM de Wiki-Masters en temps réel et détecte chaque nouvelle carte apparaissant lors d'une ouverture de booster.</p>
+              </div>
+            </div>
+            <div class="guide-feature-item">
+              <span class="fi-icon">💰</span>
+              <div>
+                <h4>Extraction du Prix</h4>
+                <p>Pour chaque carte détectée, l'extension interroge le marché de Wiki-Masters pour récupérer automatiquement le prix moyen, min et max.</p>
+              </div>
+            </div>
+            <div class="guide-feature-item">
+              <span class="fi-icon">🖼️</span>
+              <div>
+                <h4>Image Wikipédia</h4>
+                <p>L'extension extrait l'image principale de la carte depuis l'article Wikipédia correspondant (si disponible) et la stocke avec les données.</p>
+              </div>
+            </div>
+            <div class="guide-feature-item">
+              <span class="fi-icon">💾</span>
+              <div>
+                <h4>Stockage Local</h4>
+                <p>Toutes les cartes et configurations sont persistées dans le <code>chrome.storage.local</code> de l'extension, et synchronisées avec le dashboard via <code>externally_connectable</code>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONFIG DISCORD -->
+        <div class="guide-section">
+          <div class="guide-section-header">
+            <div class="guide-section-icon" style="background:rgba(88,101,242,0.1);">📡</div>
+            <h3>Configuration Discord</h3>
+          </div>
+          <div class="guide-steps-list">
+            <div class="guide-step">
+              <div class="guide-step-num">1</div>
+              <div class="guide-step-content">
+                <h4>Créer un Webhook</h4>
+                <p>Dans Discord, allez dans les paramètres du salon → <strong>Intégrations</strong> → <strong>Webhooks</strong> → <strong>Nouveau webhook</strong>. Copiez l'URL générée.</p>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">2</div>
+              <div class="guide-step-content">
+                <h4>Renseigner le Webhook</h4>
+                <p>Collez l'URL dans le champ <em>URL du Webhook Discord Principal</em> dans l'onglet <strong>Miroir Bot &amp; Discord</strong> du dashboard.</p>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">3</div>
+              <div class="guide-step-content">
+                <h4>Configurer les Filtres</h4>
+                <p>Créez des règles de filtrage pour router les drops vers des fils Discord spécifiques selon la rareté (L, UR, SR...) ou le seuil de prix en 🪙.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="guide-section">
+          <div class="guide-section-header">
+            <div class="guide-section-icon" style="background:rgba(139,92,246,0.1);">❓</div>
+            <h3>Questions Fréquentes</h3>
+          </div>
+          <div class="faq-list" id="faq-list">
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Pourquoi les cartes n'apparaissent-elles pas dans le dashboard ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Vérifiez que l'ID de l'extension est correctement renseigné dans l'onglet <em>Liaison Extension</em>. Le dashboard doit être ouvert via une URL HTTP (localhost ou GitHub Pages) et non en <code>file://</code> pour que la liaison Chrome fonctionne.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">L'extension ne détecte pas mes cartes, que faire ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Assurez-vous d'être sur la page <code>wiki-masters.com/pulls</code>. Si le problème persiste, rechargez la page et vérifiez que l'extension est bien activée dans <code>chrome://extensions</code>.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Comment supprimer une carte du cache ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Dans l'onglet <em>Historique des Cartes</em>, cliquez sur <strong>Détails</strong> d'une carte puis sur le bouton rouge <strong>Supprimer</strong>. La carte sera retirée définitivement du cache local.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Que signifient les boutons Vendu / Échangé ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Ces boutons ajoutent un tag visuel sur la carte pour indiquer qu'elle n'est plus disponible dans votre collection. Cela évite de la rechercher inutilement. La carte reste dans l'historique avec son tag coloré.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Les prix affichés sont-ils en temps réel ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Les prix sont capturés au moment du tirage par l'extension. Ils correspondent au prix de marché au moment de l'ouverture du booster. Pour les actualiser, une synchronisation manuelle est possible depuis le popup de l'extension.</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           ONGLET 5 (ancien) : LIAISON EXTENSION DIRECTE
            ================================================================== -->
       <section class="tab-pane" id="tab-bridge">
         <div class="extension-bridge-card">
@@ -521,17 +773,30 @@
       </div>
 
       <div class="modal-body">
+        <!-- IMAGE / HOLOGRAMME -->
         <div class="hologram-preview-box" id="modal-hologram-box">
-          <div style="font-size: 36px; margin-bottom: 6px;">✨</div>
-          <div style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">
-            Carte WikiMasters Officielle
+          <img id="modal-card-img" class="modal-card-img" src="" alt="" style="display:none;">
+          <div class="modal-card-placeholder" id="modal-card-placeholder">
+            <img src="./assets/logo.png" alt="WikiLogix" class="modal-placeholder-logo" onerror="this.style.display='none'">
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">
+              Carte WikiMasters Officielle
+            </div>
           </div>
         </div>
 
+        <!-- DESCRIPTION -->
         <p id="modal-card-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; font-style: italic;">
           Description encyclopédique de la carte...
         </p>
 
+        <!-- LIEN WIKIPEDIA -->
+        <a id="modal-wiki-link" class="modal-wiki-link" href="#" target="_blank" rel="noopener" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+          Voir l'article sur Wikipédia
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+
+        <!-- STATS -->
         <div class="modal-stats-grid">
           <div class="stat-cell">
             <div class="stat-cell-label">Prix Moyen Marché</div>
@@ -562,6 +827,22 @@
             <div class="stat-cell-label">Horodatage du Tirage</div>
             <div class="stat-cell-value" id="modal-val-timestamp" style="font-size: 13px;">--</div>
           </div>
+        </div>
+
+        <!-- BOUTONS D'ACTIONS -->
+        <div class="modal-actions">
+          <button class="modal-action-btn btn-sold" id="modal-btn-sold" title="Marquer comme vendue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+            🏷️ Vendu
+          </button>
+          <button class="modal-action-btn btn-traded" id="modal-btn-traded" title="Marquer comme échangée">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.99 4.7L4 8.5l3.99 3.8V9.5H15v-2H7.99V4.7zm8.02 9.1v2.8H9v2H16.01V21l3.99-3.8-3.99-3.8v2.7z"/></svg>
+            🔄 Échangé
+          </button>
+          <button class="modal-action-btn btn-delete" id="modal-btn-delete" title="Supprimer définitivement du cache">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            🗑️ Supprimer
+          </button>
         </div>
       </div>
     </div>

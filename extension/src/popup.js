@@ -243,11 +243,11 @@ function renderRecentCards(recentCards) {
   validCards.forEach((card) => {
     const norm = normalizeRarity(card.rarity);
     const rarityInfo = RARITY_CONFIG[norm] || RARITY_CONFIG.C;
-    
-    const avgP = Number(card.avgPrice) > 0 
-      ? Number(card.avgPrice) 
+
+    const avgP = Number(card.avgPrice) > 0
+      ? Number(card.avgPrice)
       : (Number(card.suggestedPrice) > 0 ? Math.round(Number(card.suggestedPrice) / 0.625) : (Number(card.minPrice) || Number(card.lastPrice) || 0));
-    
+
     const minP = avgP > 0 ? (Number(card.sellPriceMin) || Math.round(avgP * 0.50)) : (Number(card.suggestedPrice) || 0);
     const maxP = avgP > 0 ? (Number(card.sellPriceMax) || Math.round(avgP * 0.75)) : (Number(card.suggestedPrice) || 0);
 
@@ -255,12 +255,12 @@ function renderRecentCards(recentCards) {
       ? `<span style="color:#94a3b8;font-size:10px;margin-left:5px;font-weight:600;">(⚔️ ${card.attack} / 🛡️ ${card.defense})</span>`
       : '';
 
-    const pricePillText = avgP > 0 
-      ? `Moy : ${avgP.toLocaleString('fr-FR')} 🪙` 
+    const pricePillText = avgP > 0
+      ? `Moy : ${avgP.toLocaleString('fr-FR')} 🪙`
       : (card.suggestedPrice ? `Prix : ${Number(card.suggestedPrice).toLocaleString('fr-FR')} 🪙` : `Moy : 0 🪙`);
 
-    const resalePillText = (minP > 0 && maxP > 0 && minP !== maxP) 
-      ? `Revente : ${minP.toLocaleString('fr-FR')} - ${maxP.toLocaleString('fr-FR')} 🪙` 
+    const resalePillText = (minP > 0 && maxP > 0 && minP !== maxP)
+      ? `Revente : ${minP.toLocaleString('fr-FR')} - ${maxP.toLocaleString('fr-FR')} 🪙`
       : (minP > 0 ? `Revente : ${minP.toLocaleString('fr-FR')} 🪙` : `Revente : 0 🪙`);
 
     const itemEl = document.createElement('div');
@@ -745,7 +745,7 @@ function initConfigSection() {
 
   if (dom.btnOpenDashboard) {
     dom.btnOpenDashboard.addEventListener('click', () => {
-      const targetDashboardUrl = 'https://www.wiki-masters.com/pulls';
+      const targetDashboardUrl = 'https://bzhkylian.github.io/WikiLogix/dashboard';
       showToast('Redirection vers la plateforme...', 'info');
 
       setTimeout(() => {

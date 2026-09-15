@@ -259,9 +259,65 @@
   // Regex prix (moteur original — permissives et éprouvées)
   const RE_LAST = /(?:derni[eè]re?\s+(?:vente|prix)|dernier)[^\d\n\r]*([\d\s\u00a0\u202f.,]+k?)/i;
   const RE_MIN  = /(?:prix\s+min(?:imum)?|min(?:imum)?\s*:|plus\s+bas|plancher|floor)[^\d\n\r]*([\d\s\u00a0\u202f.,]+k?)/i;
-  const RE_AVG  = /(?:prix\s+moyen(?:ne)?|moyen(?:ne)?\s*:|m[eé]dian(?:ne)?)[^\d\n\r]*([\d\s\u00a0\u202f.,]+k?)/i;
+  const RE_AVG  = /(?:prix\s+moyen(?:ne)?|moyen(?:ne)?\s*:|m[eé]dian(?:ne)?|moyenne)[^\d\n\r]*([\d\s\u00a0\u202f.,]+k?)/i;
   const RE_MAX  = /(?:prix\s+max(?:imum)?|max(?:imum)?\s*:|plus\s+haut)[^\d\n\r]*([\d\s\u00a0\u202f.,]+k?)/i;
   const RE_COIN_PRICE = /(?:([\d\s\u00a0\u202f.,]+k?)\s*🪙|🪙\s*([\d\s\u00a0\u202f.,]+k?))/i;
+
+  // Labels canoniques des blocs stat reconnus (résistants aux variantes de casse et aux abréviations)
+  const STAT_LABEL_AVERAGE = ['moyenne', 'moyen', 'moy', 'moy.', 'avg', 'average', 'médian', 'median'];
+  const STAT_LABEL_LAST    = ['dernier', 'dernière', 'derniere', 'last', 'last price', 'dernier prix'];
+  const STAT_LABEL_MIN     = ['min', 'minimum', 'plancher', 'floor', 'min.'];
+  const STAT_LABEL_MAX     = ['max', 'maximum', 'plafond', 'ceiling', 'max.'];
+
+  /**
+   * Tente de lire la valeur numérique d'un "bloc stat" (label + valeur) dont le label est connu.
+   * Supporte : sibling direct, parent.querySelector, parent.nextSibling traversal.
+   */
+  function extractStatBlockValue(container, labelList) {
+    const allLeaves = container.querySelectorAll('p, span, div, td, li');
+    for (const leaf of allLeaves) {
+      // On ne cherche que les nœuds feuilles (sans enfants ou uniquement SVG)
+      const hasOnlySvgChildren = leaf.children.length > 0 &&
+        Array.from(leaf.children).every(c => c.tagName === 'SVG' || c.tagName === 'svg');
+      if (leaf.children.length > 0 && !hasOnlySvgChildren) continue;
+
+      const rawLabel = (leaf.innerText || leaf.textContent || '').trim().toLowerCase();
+      // Strip SVG text
+      const cleanLabel = rawLabel.replace(/[\n\r]+/g, ' ').trim();
+
+      if (!labelList.includes(cleanLabel)) continue;
+
+      // Strategy A: next element sibling of the label
+      const sib = leaf.nextElementSibling;
+      if (sib) {
+        const v = parsePriceString(sib.innerText || sib.textContent || '');
+        if (v > 0) return v;
+      }
+
+      // Strategy B: parent's second non-empty text child
+      const parent = leaf.parentElement;
+      if (parent) {
+        const children = Array.from(parent.children);
+        const labelIdx = children.indexOf(leaf);
+        for (let k = labelIdx + 1; k < children.length; k++) {
+          const v = parsePriceString(children[k].innerText || children[k].textContent || '');
+          if (v > 0) return v;
+        }
+
+        // Strategy C: grandparent's next sibling's text
+        const gp = parent.parentElement;
+        if (gp) {
+          const gpChildren = Array.from(gp.children);
+          const pIdx = gpChildren.indexOf(parent);
+          for (let k = pIdx + 1; k < Math.min(pIdx + 3, gpChildren.length); k++) {
+            const v = parsePriceString(gpChildren[k].innerText || gpChildren[k].textContent || '');
+            if (v > 0) return v;
+          }
+        }
+      }
+    }
+    return 0;
+  }
 
   function isPullsPage() {
     try {
@@ -529,35 +585,184 @@
     }
   }
 
+  // Inject the stealth CSS once (at script load), covering every possible
+  // modal/portal/dialog variant that wiki-masters uses.
   function ensureStealthStyle() {
     if (document.getElementById('wm-stealth-modal-style')) return;
     try {
       const stealthStyle = document.createElement('style');
       stealthStyle.id = 'wm-stealth-modal-style';
       stealthStyle.textContent = `
-        div.fixed.inset-0.z-50.wm-inspecting,
-        div.fixed.inset-0.z-50.wm-stealth-hidden,
-        [data-radix-portal] .wm-inspecting,
-        div[role="dialog"].wm-inspecting,
-        div[data-state="open"].wm-inspecting {
+        /* --- WikiLogix Stealth Layer --- */
+        /* Any element that carries our inspection marker is fully invisible,
+           with transitions & animations cut to zero so no tween can leak. */
+        .wm-inspecting,
+        .wm-stealth-hidden,
+        [data-wm-stealth="1"] {
           opacity: 0 !important;
           visibility: hidden !important;
           pointer-events: none !important;
-          transform: scale(0.001) !important;
+          transform: scale(0.0001) !important;
           transition: none !important;
           animation: none !important;
+          will-change: auto !important;
+        }
+        /* Kill any backdrop/overlay that might briefly flash */
+        [data-wm-stealth="1"] ~ *,
+        body > [data-radix-portal].wm-inspecting,
+        body > div[class*="fixed"].wm-inspecting {
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
         }
       `;
-      (document.head || document.documentElement).appendChild(stealthStyle);
+      // Insert as VERY FIRST child of <head> so it has the highest
+      // specificity lead before any site stylesheet.
+      const head = document.head || document.documentElement;
+      head.insertBefore(stealthStyle, head.firstChild);
     } catch (_) {}
   }
   ensureStealthStyle();
 
+  // Inline-style helper — applied in addition to the CSS class so there is
+  // zero reliance on selector matching timing.
+  function applyStealthInline(el) {
+    if (!el || !(el instanceof Element)) return;
+    el.style.setProperty('opacity',     '0',       'important');
+    el.style.setProperty('visibility',  'hidden',  'important');
+    el.style.setProperty('pointer-events', 'none', 'important');
+    el.style.setProperty('transform',   'scale(0.0001)', 'important');
+    el.style.setProperty('transition',  'none',    'important');
+    el.style.setProperty('animation',   'none',    'important');
+    el.setAttribute('data-wm-stealth', '1');
+  }
+
+  function removeStealthInline(el) {
+    if (!el || !(el instanceof Element)) return;
+    el.style.removeProperty('opacity');
+    el.style.removeProperty('visibility');
+    el.style.removeProperty('pointer-events');
+    el.style.removeProperty('transform');
+    el.style.removeProperty('transition');
+    el.style.removeProperty('animation');
+    el.removeAttribute('data-wm-stealth');
+  }
+
+  /**
+   * Automatise la détection de la rareté de la carte et le clic sur le filtre
+   * correspondant dans le panneau Marché de Wiki-Masters.
+   *
+   * @param {HTMLElement} [modal=document] - L'élément racine de la modale (.card-frame ou div parent)
+   * @param {string|null} [fallbackRarity=null] - Rareté de secours si le badge DOM est absent
+   * @param {number} [refreshWaitMs=150] - Délai d'attente pour la mise à jour React du DOM (100-200ms)
+   * @returns {Promise<{ success: boolean, rarity: string|null, updated: boolean }>}
+   */
+  async function autoFilterMarketRarity(modal = document, fallbackRarity = null, refreshWaitMs = 150) {
+    if (!modal) return { success: false, rarity: null, updated: false };
+
+    const cleanStr = (s) =>
+      (s || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ');
+
+    const RARITY_ALIASES = {
+      'l': ['l', 'legendaire', 'legendary'],
+      'ur': ['ur', 'ultra rare', 'ultra-rare'],
+      'sr': ['sr', 'super rare', 'super-rare'],
+      'r': ['r', 'rare'],
+      'pc': ['pc', 'peu commune', 'peu commun'],
+      'c': ['c', 'commune', 'commun']
+    };
+
+    // 1. Détection de la rareté cible dans la modale
+    let targetRarity = null;
+
+    // Badge exact dans la modale :
+    // <span class="inline-block px-2 py-0.5 rounded text-xs font-bold" style="background-color: var(--color-rarity-l)...">Légendaire</span>
+    const rarityBadge = modal.querySelector(
+      'span[style*="--color-rarity-"], span.inline-block.rounded.text-xs.font-bold, span[class*="text-xs"][class*="font-bold"]'
+    );
+
+    if (rarityBadge) {
+      targetRarity = rarityBadge.innerText.trim();
+    } else {
+      const coloredElement = modal.querySelector('[style*="--color-rarity-"]');
+      if (coloredElement) {
+        const style = coloredElement.getAttribute('style') || '';
+        if (style.includes('--color-rarity-l')) targetRarity = 'Légendaire';
+        else if (style.includes('--color-rarity-ur')) targetRarity = 'Ultra Rare';
+        else if (style.includes('--color-rarity-sr')) targetRarity = 'Super Rare';
+        else if (style.includes('--color-rarity-r')) targetRarity = 'Rare';
+        else if (style.includes('--color-rarity-pc')) targetRarity = 'Peu commune';
+        else if (style.includes('--color-rarity-c')) targetRarity = 'Commune';
+      }
+    }
+
+    if (!targetRarity && fallbackRarity) {
+      targetRarity = fallbackRarity;
+    }
+
+    if (!targetRarity) {
+      return { success: false, rarity: null, updated: false };
+    }
+
+    const normalizedTarget = cleanStr(targetRarity);
+
+    // Résolution des alias pour matcher les formes courtes et complètes
+    let targetAliases = [normalizedTarget];
+    for (const aliases of Object.values(RARITY_ALIASES)) {
+      if (aliases.includes(normalizedTarget)) {
+        targetAliases = aliases;
+        break;
+      }
+    }
+
+    // 2. Recherche des boutons de filtre dans le conteneur .flex.flex-wrap.gap-1.5
+    // Structure: <button type="button" class="px-2 py-0.5 rounded-full text-[10px] font-semibold border..." aria-pressed="...">
+    const filterButtons = Array.from(
+      modal.querySelectorAll(
+        '.flex-wrap button.rounded-full, button.px-2.py-0\\.5.rounded-full.text-\\[10px\\], button[class*="rounded-full"][class*="text-[10px]"], button[class*="px-2"][class*="py-0.5"]'
+      )
+    );
+
+    if (filterButtons.length === 0) {
+      return { success: false, rarity: targetRarity, updated: false };
+    }
+
+    const targetButton = filterButtons.find(btn => {
+      let btnText = (btn.innerText || btn.textContent || '').trim();
+      btnText = btnText.replace(/\s*\(\d+\)/g, ''); // Supprime les compteurs éventuels
+      const normBtnText = cleanStr(btnText);
+      return targetAliases.includes(normBtnText);
+    });
+
+    if (!targetButton) {
+      return { success: false, rarity: targetRarity, updated: false };
+    }
+
+    // Vérifier si le filtre est déjà actif (aria-pressed="true")
+    if (targetButton.getAttribute('aria-pressed') === 'true') {
+      return { success: true, rarity: targetRarity, updated: false };
+    }
+
+    // Clic sécurisé avec PointerEvent + MouseEvent + click natif (compatible React 18)
+    forceClickElement(targetButton);
+    console.log(`🎯 [WikiLogix Filter] Filtre rareté activé : "${targetRarity}"`);
+
+    // 3. Attente asynchrone du rafraîchissement React
+    await new Promise(resolve => setTimeout(resolve, refreshWaitMs));
+
+    return { success: true, rarity: targetRarity, updated: true };
+  }
+
   function inspectCardPricesStealth(cardElement, cardData, callback) {
     let isFinished = false;
     let activeModalRef = null;
-    let pollModal = null;
     let pollMarketData = null;
+    let modalWatcher = null; // MutationObserver to catch modal the instant it's added
 
     const finishInspection = () => {
       if (isFinished) return;
@@ -567,17 +772,19 @@
         clearTimeout(inspectionWatchdog);
         inspectionWatchdog = null;
       }
-      if (pollModal) { clearInterval(pollModal); pollModal = null; }
       if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
+      if (modalWatcher)   { modalWatcher.disconnect(); modalWatcher = null; }
 
       try {
         if (activeModalRef) {
           activeModalRef.classList.remove('wm-inspecting');
+          removeStealthInline(activeModalRef);
           forceCloseModal(activeModalRef);
         } else {
           const openModal = document.querySelector('div.fixed.inset-0.z-50');
           if (openModal) {
             openModal.classList.remove('wm-inspecting');
+            removeStealthInline(openModal);
             forceCloseModal(openModal);
           }
         }
@@ -595,157 +802,339 @@
       }, 30);
     };
 
-    // Watchdog strict d'inspection (1.8s max)
-    inspectionWatchdog = setTimeout(() => {
-      console.warn("⚠️ [Watchdog Inspection] Timeout 1.8s atteint, reprise immédiate.");
-      finishInspection();
-    }, 1800);
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helper: fully hides a modal and starts reading market data from it.
+    // Implements a multi-strategy, retry-aware price extractor that handles
+    // React hydration race conditions gracefully.
+    // ─────────────────────────────────────────────────────────────────────────
+    const handleModalFound = (modal) => {
+      if (activeModalRef) return; // already handling one
+      activeModalRef = modal;
 
-    try {
-      forceClickElement(cardElement);
-    } catch (err) {
-      finishInspection();
-      return;
-    }
+      // ── ZERO-FLASH: apply stealth BEFORE any layout/paint can happen ──
+      modal.classList.add('wm-inspecting');
+      applyStealthInline(modal);
+      const portal = modal.closest('[data-radix-portal]') || modal.parentElement;
+      if (portal && portal !== document.body) {
+        portal.classList.add('wm-inspecting');
+        applyStealthInline(portal);
+      }
 
-    let openAttempts = 0;
-    pollModal = setInterval(() => {
-      openAttempts++;
-      const modal = document.querySelector('div.fixed.inset-0.z-50');
+      // ── Market tab click with retry (React may not render tabs instantly) ──
+      let tabClickAttempts = 0;
+      const MAX_TAB_CLICKS = 4;
+      const TAB_CLICK_GAP  = 100; // ms
 
-      if (modal) {
-        clearInterval(pollModal);
-        pollModal = null;
-        activeModalRef = modal;
-        modal.classList.add('wm-inspecting');
-
-        // Cliquer sur l'onglet Marché / Historique
-        const tabs = Array.from(modal.querySelectorAll('button[role="tab"], button, div[role="button"]'));
+      function tryClickMarketTab() {
+        tabClickAttempts++;
+        const tabs = Array.from(modal.querySelectorAll(
+          'button[role="tab"], [role="tablist"] button, nav button, button, div[role="button"]'
+        ));
         const marketTab = tabs.find(t => {
           const txt = (t.innerText || t.textContent || '').toLowerCase();
-          return txt.includes('march') || txt.includes('vente') || txt.includes('historique');
+          return txt.includes('march') || txt.includes('vente') || txt.includes('historique') ||
+                 txt.includes('market') || txt.includes('history') || txt.includes('sales');
         });
-        if (marketTab) forceClickElement(marketTab);
+        if (marketTab) {
+          forceClickElement(marketTab);
+          return true; // clicked
+        }
+        return false;
+      }
 
-        let waitDataAttempts = 0;
+      // First attempt immediately, then retry with delays
+      if (!tryClickMarketTab() && tabClickAttempts < MAX_TAB_CLICKS) {
+        const tabRetryTimer = setInterval(() => {
+          if (tryClickMarketTab() || tabClickAttempts >= MAX_TAB_CLICKS || isFinished) {
+            clearInterval(tabRetryTimer);
+          }
+        }, TAB_CLICK_GAP);
+      }
+
+      // ── Price extraction loop ──────────────────────────────────────────────
+      // Polls at 70ms intervals. On each tick, tries 5 independent extraction
+      // strategies and accepts the first one that yields a price > 0.
+      // If no price found after 5 ticks, re-clicks the market tab (handles
+      // cases where the first click arrived before the tab was ready).
+      // Max budget: 18 ticks × 70ms = ~1.26s before giving up.
+      const MAX_POLL_ATTEMPTS = 10;
+      const RETAB_AT_TICK     = 3;  // re-click market tab if still no price at tick 3
+
+      let waitDataAttempts = 0;
+
+      /**
+       * Core extraction function — runs all 5 strategies against `container`
+       * and returns { avg, last, min, max, listings[] }.
+       */
+      function extractPricesFromContainer(container) {
+        const marketText = (container.innerText || container.textContent || '');
+
+        // ── Strategy 1: Global regex on text content ──────────────────────
+        const extractFromRegex = (regex) => {
+          const m = marketText.match(regex);
+          return m ? parsePriceString(m[1]) : 0;
+        };
+        const regexAvg  = extractFromRegex(RE_AVG);
+        const regexLast = extractFromRegex(RE_LAST);
+        const regexMin  = extractFromRegex(RE_MIN);
+        const regexMax  = extractFromRegex(RE_MAX);
+
+        // ── Strategy 2: 🪙 coin symbol scan — leaf nodes only ─────────────
+        const listingPrices = [];
+        const allNodes = container.querySelectorAll('span, div, td, p, li, b, strong');
+        for (const el of allNodes) {
+          // Accept leaves AND nodes whose only children are SVG icons
+          const nonSvgChildren = Array.from(el.children).filter(c => c.tagName !== 'SVG' && c.tagName !== 'svg');
+          if (nonSvgChildren.length > 0) continue;
+          const rawText = (el.innerText || el.textContent || '').trim();
+          if (!rawText.includes('🪙')) continue;
+          const coinMatch = rawText.match(RE_COIN_PRICE);
+          if (coinMatch) {
+            const pStr = coinMatch[1] || coinMatch[2];
+            const pVal = parsePriceString(pStr);
+            if (pVal > 0 && pVal < 10_000_000) listingPrices.push(pVal);
+          }
+        }
+
+        // ── Strategy 3: Structured stat-block scan (label + adjacent value) ─
+        const statAvg  = extractStatBlockValue(container, STAT_LABEL_AVERAGE);
+        const statLast = extractStatBlockValue(container, STAT_LABEL_LAST);
+        const statMin  = extractStatBlockValue(container, STAT_LABEL_MIN);
+        const statMax  = extractStatBlockValue(container, STAT_LABEL_MAX);
+
+        // ── Strategy 4: Parent-walk from any 🪙 element ───────────────────
+        // Some React components wrap the price in a sibling container; walk
+        // up 3 levels from each coin element to find a numeric sibling.
+        let walkAvg = 0, walkMin = 0, walkMax = 0;
+        const coinNodes = container.querySelectorAll('*');
+        for (const el of coinNodes) {
+          if (!(el.innerText || el.textContent || '').includes('🪙')) continue;
+          let probe = el.parentElement;
+          for (let d = 0; d < 3 && probe && probe !== container; d++, probe = probe.parentElement) {
+            const txt = (probe.innerText || probe.textContent || '');
+            const labelTxt = txt.toLowerCase();
+            if (STAT_LABEL_AVERAGE.some(l => labelTxt.includes(l))) {
+              const v = parsePriceString(txt);
+              if (v > 0 && !walkAvg) walkAvg = v;
+            } else if (STAT_LABEL_MIN.some(l => labelTxt.includes(l))) {
+              const v = parsePriceString(txt);
+              if (v > 0 && !walkMin) walkMin = v;
+            } else if (STAT_LABEL_MAX.some(l => labelTxt.includes(l))) {
+              const v = parsePriceString(txt);
+              if (v > 0 && !walkMax) walkMax = v;
+            }
+          }
+        }
+
+        // ── Strategy 5: Positional scan — find all rounded "stat cards"
+        // wiki-masters renders price blocks as div > p(label) + p(value).
+        // Scan every small container that has exactly 2 short text children.
+        let posAvg = 0, posLast = 0, posMin = 0, posMax = 0;
+        const statCards = container.querySelectorAll(
+          'div[class*="rounded"], div[class*="border"], div[class*="px-"], div[class*="py-"]'
+        );
+        for (const card of statCards) {
+          if (card.closest('.wm-inspecting, #wikilogix-toast-container')) continue;
+          const children = Array.from(card.children).filter(c => c.tagName === 'P' || c.tagName === 'SPAN' || c.tagName === 'DIV');
+          if (children.length < 2) continue;
+          const labelText = (children[0].innerText || children[0].textContent || '').trim().toLowerCase();
+          const valueText = (children[1].innerText || children[1].textContent || '').trim();
+          if (!valueText) continue;
+          const v = parsePriceString(valueText);
+          if (v <= 0 || v >= 10_000_000) continue;
+          if (STAT_LABEL_AVERAGE.some(l => labelText.includes(l)) && !posAvg) posAvg = v;
+          else if (STAT_LABEL_LAST.some(l => labelText.includes(l)) && !posLast) posLast = v;
+          else if (STAT_LABEL_MIN.some(l => labelText.includes(l)) && !posMin) posMin = v;
+          else if (STAT_LABEL_MAX.some(l => labelText.includes(l)) && !posMax) posMax = v;
+        }
+
+        // ── Merge: priority = statBlock > positional > parent-walk > regex ──
+        return {
+          avg:      statAvg  || posAvg  || walkAvg  || regexAvg,
+          last:     statLast || posLast || regexLast,
+          min:      statMin  || posMin  || walkMin  || regexMin,
+          max:      statMax  || posMax  || walkMax  || regexMax,
+          listings: listingPrices
+        };
+      }
+
+      // ── Gestion du filtrage automatique par rareté dans le panneau Marché ──
+      // Le filtre est appliqué en PREMIER avec await avant tout scraping de prix,
+      // garantissant que les prix lus correspondent bien à la rareté de la carte.
+      let rarityFilterApplied = false;
+
+      async function ensureRarityFilterApplied() {
+        if (rarityFilterApplied || isFinished) return;
+        try {
+          const res = await autoFilterMarketRarity(modal, cardData.rarity, 80);
+          rarityFilterApplied = true;
+          if (res.updated) {
+            console.log(`🎯 [WikiLogix Filter] Rareté filtrée : "${res.rarity}" — attente mise à jour React…`);
+            // Attendre un cycle React supplémentaire après le clic pour que les prix soient recalculés
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (e) {
+          console.warn('[WikiLogix Filter] Erreur lors du filtrage :', e);
+          rarityFilterApplied = true; // Ne pas bloquer indéfiniment
+        }
+      }
+
+      // Lance d'abord le filtrage par rareté de façon atomique, puis démarre la boucle de scraping
+      (async () => {
+        // Attendre que l'onglet Marché soit cliqué et que React ait rendu le panneau
+        // avant de tenter le filtrage (50ms suffisent pour la majorité des cas)
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Appliquer le filtre de rareté (avec await — bloquant pour cette coroutine)
+        await ensureRarityFilterApplied();
+
+        if (isFinished) return;
+
+        // ── Price extraction loop ────────────────────────────────────────────
+        // Maintenant que la rareté correcte est sélectionnée, on peut scraper
+        // les prix en toute sécurité.
         pollMarketData = setInterval(() => {
           waitDataAttempts++;
 
+          // Re-click the market tab at tick RETAB_AT_TICK if we still have no prices
+          // (handles race where first click happened before tab was rendered)
+          if (waitDataAttempts === RETAB_AT_TICK) {
+            tryClickMarketTab();
+          }
+
           try {
-            const marketContainer = modal.querySelector('[role="tabpanel"], div[class*="tab-content"], div[class*="market"], div[class*="table"], div[class*="history"], div[class*="ventes"]') || modal;
-            const marketText = (marketContainer.innerText || marketContainer.textContent || '');
+            // ── Court-circuit : aucune vente détectée ─────────────────────
+            // Si le DOM contient "Aucune vente pour l'instant." on renvoie 0
+            // immédiatement sans attendre les ticks restants.
+            const hasNoSales = Array.from(modal.querySelectorAll('p, span, div')).some(el => {
+              if (el.children.length > 0) return false; // feuilles seulement
+              const t = (el.innerText || el.textContent || '').trim().toLowerCase();
+              return t.includes('aucune vente');
+            });
+            if (hasNoSales) {
+              if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
+              console.log(`⚪ [WikiLogix Prix] "${cardData.name}" → Aucune vente, prix = 0`);
+              finishInspection();
+              return;
+            }
+            // Prefer the active tabpanel; fall back to the whole modal
+            const marketContainer =
+              modal.querySelector('[role="tabpanel"]:not([hidden]):not([aria-hidden="true"])') ||
+              modal.querySelector('[role="tabpanel"], div[class*="tab-content"], div[class*="market"], div[class*="history"], div[class*="ventes"]') ||
+              modal;
 
-            // Extraction 1 : Regex sur le texte global (méthode éprouvée)
-            const extractFromRegex = (regex) => {
-              const m = marketText.match(regex);
-              return m ? parsePriceString(m[1]) : 0;
-            };
-
-            const lastVal = extractFromRegex(RE_LAST);
-            const minVal  = extractFromRegex(RE_MIN);
-            const avgVal  = extractFromRegex(RE_AVG);
-            const maxVal  = extractFromRegex(RE_MAX);
-
-            // Extraction 2 : RE_COIN_PRICE sur les éléments feuilles avec 🪙
-            let listingPrices = [];
-            const coinPriceElements = marketContainer.querySelectorAll('span, div, td, p');
-            for (let i = 0; i < coinPriceElements.length; i++) {
-              const el = coinPriceElements[i];
-              if (el.children.length === 0) {
-                const rawText = (el.innerText || el.textContent || '').trim();
-                const coinMatch = rawText.match(RE_COIN_PRICE);
-                if (coinMatch) {
-                  const pStr = coinMatch[1] || coinMatch[2];
-                  const pVal = parsePriceString(pStr);
-                  if (pVal > 0 && pVal < 10000000) {
-                    listingPrices.push(pVal);
-                  }
-                }
-              }
+            // ── Content-ready guard ────────────────────────────────────────
+            // If the market tab panel appears completely empty or shows only a
+            // loader, wait one more tick before parsing — the data isn't there yet.
+            const rawText = (marketContainer.innerText || marketContainer.textContent || '').trim();
+            const looksLoading = rawText.length < 10 ||
+                                 marketContainer.querySelector('[class*="spin"], [class*="loading"], [class*="skeleton"]');
+            if (looksLoading && waitDataAttempts < MAX_POLL_ATTEMPTS - 2) {
+              return; // wait for next tick
             }
 
-            // Extraction 3 : Blocs stat par label texte (Moyenne, Dernier, Min, Max)
-            let statAvg = 0, statLast = 0, statMin = 0, statMax = 0;
-            const allLabels = marketContainer.querySelectorAll('p, span');
-            for (let i = 0; i < allLabels.length; i++) {
-              const el = allLabels[i];
-              if (el.children.length > 0) continue;
-              const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
-              const nextEl = el.nextElementSibling || el.parentElement?.querySelector('p:nth-of-type(2), span:nth-of-type(2)');
-              if (!nextEl) continue;
-              const nextVal = parsePriceString(nextEl.innerText || nextEl.textContent || '');
+            const { avg, last, min, max, listings } = extractPricesFromContainer(marketContainer);
+            const hasFoundPrice = avg > 0 || last > 0 || min > 0 || max > 0 || listings.length > 0;
 
-              if (nextVal > 0) {
-                if ((txt === 'moyenne' || txt.includes('moyen') || txt.includes('médian')) && !statAvg) statAvg = nextVal;
-                if ((txt === 'dernier' || txt.includes('dernièr')) && !statLast) statLast = nextVal;
-                if ((txt === 'min' || txt === 'minimum') && !statMin) statMin = nextVal;
-                if ((txt === 'max' || txt === 'maximum') && !statMax) statMax = nextVal;
-              }
-            }
-
-            // Fusion : priorité aux blocs stat, fallback regex, fallback listing
-            const finalAvg  = statAvg  || avgVal;
-            const finalLast = statLast || lastVal;
-            const finalMin  = statMin  || minVal;
-            const finalMax  = statMax  || maxVal;
-
-            const hasFoundPrice = finalAvg > 0 || finalLast > 0 || finalMin > 0 || finalMax > 0 || listingPrices.length > 0;
-
-            if (hasFoundPrice || waitDataAttempts >= 10) {
+            if (hasFoundPrice || waitDataAttempts >= MAX_POLL_ATTEMPTS) {
               if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
 
-              if (finalLast > 0) cardData.lastPrice = String(finalLast);
-              if (finalMin > 0)  cardData.minPrice  = String(finalMin);
-              if (finalAvg > 0)  cardData.avgPrice  = String(finalAvg);
-              if (finalMax > 0)  cardData.maxPrice  = String(finalMax);
+              // Commit results to cardData
+              if (last > 0) cardData.lastPrice = String(last);
+              if (min  > 0) cardData.minPrice  = String(min);
+              if (avg  > 0) cardData.avgPrice  = String(avg);
+              if (max  > 0) cardData.maxPrice  = String(max);
 
-              if (listingPrices.length > 0) {
-                const sortedPrices = [...listingPrices].sort((a, b) => a - b);
-                if (!cardData.minPrice || cardData.minPrice === '0') {
-                  cardData.minPrice = String(sortedPrices[0]);
-                }
-                if (!cardData.maxPrice || cardData.maxPrice === '0') {
-                  cardData.maxPrice = String(sortedPrices[sortedPrices.length - 1]);
-                }
-                if (!cardData.avgPrice || cardData.avgPrice === '0') {
-                  const sum = sortedPrices.reduce((a, b) => a + b, 0);
-                  cardData.avgPrice = String(Math.round(sum / sortedPrices.length));
-                }
-                if (!cardData.lastPrice || cardData.lastPrice === '0') {
-                  cardData.lastPrice = String(listingPrices[0]);
-                }
+              // Supplement from listing prices if any stat is still missing
+              if (listings.length > 0) {
+                const sorted = [...listings].sort((a, b) => a - b);
+                const listMin = sorted[0];
+                const listMax = sorted[sorted.length - 1];
+                const listAvg = Math.round(sorted.reduce((a, b) => a + b, 0) / sorted.length);
+                const listLast = listings[0]; // most recent = first encountered
+
+                if (!cardData.minPrice  || cardData.minPrice  === '0') cardData.minPrice  = String(listMin);
+                if (!cardData.maxPrice  || cardData.maxPrice  === '0') cardData.maxPrice  = String(listMax);
+                if (!cardData.avgPrice  || cardData.avgPrice  === '0') cardData.avgPrice  = String(listAvg);
+                if (!cardData.lastPrice || cardData.lastPrice === '0') cardData.lastPrice = String(listLast);
               }
 
+              // Compute suggested resale price
               const parsedMin  = parseFloat(cardData.minPrice)  || 0;
-              const parsedAvg  = parseFloat(cardData.avgPrice)   || 0;
-              const parsedLast = parseFloat(cardData.lastPrice)  || 0;
+              const parsedAvg  = parseFloat(cardData.avgPrice)  || 0;
+              const parsedLast = parseFloat(cardData.lastPrice) || 0;
 
               if (parsedMin > 0 && parsedAvg > 0) {
-                if (parsedAvg > parsedMin * 2.5) {
-                  cardData.suggestedPrice = Math.round(parsedMin * 1.15) || (parsedMin + 1);
-                } else {
-                  cardData.suggestedPrice = Math.round((parsedMin + parsedAvg) / 2);
-                }
+                cardData.suggestedPrice = parsedAvg > parsedMin * 2.5
+                  ? Math.round(parsedMin * 1.15) || (parsedMin + 1)
+                  : Math.round((parsedMin + parsedAvg) / 2);
               } else {
                 cardData.suggestedPrice = Math.round(parsedMin || parsedAvg || parsedLast || 0);
               }
 
-              console.log(`💰 [WikiLogix Prix] "${cardData.name}" → Avg:${cardData.avgPrice} Min:${cardData.minPrice} Max:${cardData.maxPrice} Last:${cardData.lastPrice} (${listingPrices.length} prix listing)`);
+              const strategyUsed = avg > 0 ? 'stat/regex' : listings.length > 0 ? 'listing' : 'timeout';
+              console.log(
+                `💰 [WikiLogix Prix] "${cardData.name}" → Avg:${cardData.avgPrice} Min:${cardData.minPrice} Max:${cardData.maxPrice} Last:${cardData.lastPrice}`,
+                `(${listings.length} prix listing | tick ${waitDataAttempts}/${MAX_POLL_ATTEMPTS} | strategy: ${strategyUsed})`
+              );
               finishInspection();
             }
           } catch (e) {
-            console.warn("Notice: Parsing marché error", e);
+            console.warn('[WikiLogix] Notice: Parsing marché error', e);
             finishInspection();
           }
         }, 70);
-        return;
-      }
+      })(); // fin de l'IIFE async — lance le filtrage puis le scraping
+    };
 
-      if (openAttempts > 7) {
-        if (pollModal) { clearInterval(pollModal); pollModal = null; }
-        finishInspection();
+    // Watchdog strict d'inspection (1s max — filtre ~230ms + scraping ~700ms)
+    inspectionWatchdog = setTimeout(() => {
+      console.warn("⚠️ [Watchdog Inspection] Timeout 1s atteint, reprise immédiate.");
+      finishInspection();
+    }, 1000);
+
+    // ── KEY FIX: observe document.body for the modal BEFORE triggering the click.
+    // This way we catch the modal node the very instant it's added to the DOM,
+    // in the same synchronous microtask — before the browser can paint a frame.
+    modalWatcher = new MutationObserver((mutations) => {
+      if (activeModalRef || isFinished) return;
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof Element)) continue;
+          // Check the added node itself
+          if (node.matches('div.fixed.inset-0.z-50, div[role="dialog"], div[data-state="open"]') ||
+              node.querySelector('div.fixed.inset-0.z-50, div[role="dialog"]')) {
+            const modal = node.matches('div.fixed.inset-0.z-50') ? node
+                        : node.querySelector('div.fixed.inset-0.z-50') || node;
+            modalWatcher.disconnect();
+            modalWatcher = null;
+            handleModalFound(modal);
+            return;
+          }
+        }
       }
-    }, 50);
+    });
+    modalWatcher.observe(document.body || document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+
+    // Trigger the click AFTER the observer is set up.
+    try {
+      forceClickElement(cardElement);
+    } catch (err) {
+      if (modalWatcher) { modalWatcher.disconnect(); modalWatcher = null; }
+      finishInspection();
+      return;
+    }
+
+    // Fallback: if the modal was already open before we started observing
+    // (rare but possible with fast frameworks), handle it immediately.
+    const existingModal = document.querySelector('div.fixed.inset-0.z-50');
+    if (existingModal && !activeModalRef) {
+      if (modalWatcher) { modalWatcher.disconnect(); modalWatcher = null; }
+      handleModalFound(existingModal);
+    }
   }
 
   // ==========================================================================
