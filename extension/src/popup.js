@@ -758,6 +758,32 @@ function initConfigSection() {
     });
   }
 
+  const btnOpenDiscord = document.getElementById('btn-open-discord');
+  if (btnOpenDiscord) {
+    btnOpenDiscord.addEventListener('click', (e) => {
+      e.preventDefault();
+      const discordUrl = 'https://discord.gg/wikilogix';
+      if (typeof chrome !== 'undefined' && chrome.tabs) {
+        chrome.tabs.create({ url: discordUrl });
+      } else {
+        window.open(discordUrl, '_blank');
+      }
+    });
+  }
+
+  const footerDiscordLink = document.getElementById('footer-discord-link');
+  if (footerDiscordLink) {
+    footerDiscordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const discordUrl = 'https://discord.gg/wikilogix';
+      if (typeof chrome !== 'undefined' && chrome.tabs) {
+        chrome.tabs.create({ url: discordUrl });
+      } else {
+        window.open(discordUrl, '_blank');
+      }
+    });
+  }
+
   if (dom.btnRefreshStats) {
     dom.btnRefreshStats.addEventListener('click', async () => {
       dom.btnRefreshStats.style.opacity = '0.6';

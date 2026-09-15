@@ -58,6 +58,10 @@
       </nav>
 
       <div class="sidebar-footer">
+        <a href="https://discord.gg/wikilogix" target="_blank" rel="noopener" class="sidebar-discord-btn" id="sidebar-discord-btn" title="Rejoindre notre communauté Discord">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          <span>Rejoindre le Discord</span>
+        </a>
         <div class="sidebar-status-box">
           <div class="status-indicator">
             <span class="status-dot disconnected" id="sidebar-status-dot"></span>
@@ -81,6 +85,11 @@
         </div>
 
         <div class="header-actions">
+          <a href="https://discord.gg/wikilogix" target="_blank" rel="noopener" class="btn btn-discord" id="header-discord-btn" title="Communauté et Support Discord">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+            Rejoindre le Discord
+          </a>
+
           <div class="auto-sync-wrapper">
             <span>Auto-Sync</span>
             <label class="switch">
@@ -88,10 +97,6 @@
               <span class="slider"></span>
             </label>
           </div>
-
-          <button class="btn btn-secondary btn-sm" id="btn-toggle-simulation">
-            Lancer Simulation Directe
-          </button>
 
           <button class="btn btn-primary" id="btn-sync-now">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
@@ -109,9 +114,15 @@
           <img src="./assets/logo.png" alt="WikiLogix Logo" class="home-hero-logo" onerror="this.style.display='none'">
           <h2>WikiLogix PRO</h2>
           <p class="home-hero-tagline">
-            L'extension Chrome intelligente pour automatiser l'ouverture de boosters sur <strong>Wiki-Masters</strong>, tracker vos cartes et analyser vos gains en temps réel.
+            L'extension Chrome intelligente pour suivre vos tirages de boosters en temps réel sur <strong>Wiki-Masters</strong>, répertorier vos cartes et analyser vos gains.
           </p>
-          <span class="home-hero-badge">Extension Chrome · Version Active</span>
+          <div style="margin-top: 18px; display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
+            <a href="https://discord.gg/wikilogix" target="_blank" rel="noopener" class="btn btn-discord">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+              Rejoindre le Discord
+            </a>
+            <span class="home-hero-badge">Extension Chrome · Bientôt sur le Marketplace</span>
+          </div>
         </div>
 
         <!-- KPIs LIVE -->
@@ -137,22 +148,22 @@
         <!-- FONCTIONNALITÉS -->
         <div style="padding: 0 24px;">
           <p class="home-section-title">⚡ Fonctionnalités Clés</p>
-          <p class="home-section-sub">Tout ce dont vous avez besoin pour optimiser votre farm WikiMasters.</p>
+          <p class="home-section-sub">Tout ce dont vous avez besoin pour suivre et valoriser votre collection WikiMasters.</p>
           <div class="features-grid">
             <div class="feature-card" style="--feature-color: #06b6d4;">
-              <span class="feature-icon">🤖</span>
-              <h4>Farm Automatique</h4>
-              <p>Ouverture automatique de boosters en continu avec protection anti-spam intégrée.</p>
+              <span class="feature-icon">👁️</span>
+              <h4>Détection &amp; Suivi en Direct</h4>
+              <p>Capture automatique et inventaire instantané de chaque carte tirée lors de vos ouvertures de boosters.</p>
             </div>
             <div class="feature-card" style="--feature-color: #ffe144;">
               <span class="feature-icon">🪙</span>
-              <h4>Prix du Marché</h4>
-              <p>Récupération des prix réels du marché WikiMasters pour chaque carte tirée.</p>
+              <h4>Prix du Marché (WikiMasters Pro)</h4>
+              <p>Récupération des cours réels du marché pour chaque carte tirée (nécessite un compte WikiMasters Pro).</p>
             </div>
             <div class="feature-card" style="--feature-color: #5865F2;">
               <span class="feature-icon">📡</span>
               <h4>Notifications Discord</h4>
-              <p>Embeds Discord automatiques pour chaque drop, avec filtres et routage par fils.</p>
+              <p>Embeds Discord automatiques pour chaque drop, avec filtres et routage par fils de discussion.</p>
             </div>
             <div class="feature-card" style="--feature-color: #ed6fa3;">
               <span class="feature-icon">📈</span>
@@ -162,12 +173,12 @@
             <div class="feature-card" style="--feature-color: #10b981;">
               <span class="feature-icon">🗂️</span>
               <h4>Historique Complet</h4>
-              <p>Consultez, filtrez et gérez l'intégralité de vos cartes avec statuts vendu/échangé.</p>
+              <p>Consultez, filtrez et gérez l'intégralité de vos cartes avec statuts vendu/échangé/disponible.</p>
             </div>
             <div class="feature-card" style="--feature-color: #8b5cf6;">
               <span class="feature-icon">🔗</span>
               <h4>Liaison Extension</h4>
-              <p>Synchronisation directe via <code style="font-family:monospace;font-size:11px;background:rgba(139,92,246,.15);color:#8b5cf6;padding:1px 5px;border-radius:3px;">externally_connectable</code> Chrome.</p>
+              <p>Synchronisation directe et instantanée avec l'extension Chrome via <code style="font-family:monospace;font-size:11px;background:rgba(139,92,246,.15);color:#8b5cf6;padding:1px 5px;border-radius:3px;">externally_connectable</code>.</p>
             </div>
           </div>
         </div>
@@ -175,22 +186,22 @@
         <!-- DÉMARRAGE -->
         <div style="padding: 0 24px 32px;">
           <p class="home-section-title">🚀 Comment Démarrer ?</p>
-          <p class="home-section-sub">3 étapes simples pour commencer à farmer.</p>
+          <p class="home-section-sub">3 étapes simples pour utiliser WikiLogix.</p>
           <div class="steps-grid">
             <div class="step-card">
               <div class="step-number">1</div>
               <h4>Installer l'Extension</h4>
-              <p>Chargez l'extension WikiLogix dans Chrome via <strong>chrome://extensions</strong> en mode développeur.</p>
+              <p>Bientôt disponible en 1 clic sur le <strong>Chrome Web Store</strong> ! En attendant, chargez le dossier <code>extension/</code> dans Chrome via <strong>chrome://extensions</strong> en mode développeur.</p>
             </div>
             <div class="step-card">
               <div class="step-number">2</div>
-              <h4>Configurer le Dashboard</h4>
-              <p>Renseignez l'ID de l'extension dans l'onglet <em>Liaison Extension</em> pour activer la synchronisation.</p>
+              <h4>Dashboard 100% en Ligne</h4>
+              <p><strong>Aucun téléchargement local requis</strong> : ce dashboard est hébergé en ligne sur GitHub Pages et accessible directement pour tous.</p>
             </div>
             <div class="step-card">
               <div class="step-number">3</div>
-              <h4>Lancer le Farm</h4>
-              <p>Sur Wiki-Masters, ouvrez un booster — l'extension détecte et enregistre automatiquement chaque carte.</p>
+              <h4>Ouvrir vos Boosters</h4>
+              <p>Sur Wiki-Masters, ouvrez vos boosters — l'extension détecte, extrait les prix et enregistre automatiquement chaque carte tirée.</p>
             </div>
           </div>
         </div>
@@ -209,7 +220,7 @@
               <div class="kpi-icon-box">📦</div>
             </div>
             <div class="kpi-value" id="kpi-val-boosters">0</div>
-            <div class="kpi-subtext">Session de farm en cours</div>
+            <div class="kpi-subtext">Session de tirages en cours</div>
           </div>
 
           <div class="kpi-card">
@@ -414,14 +425,27 @@
             <input type="text" id="table-search-input" placeholder="Rechercher une carte par nom ou mot-clé...">
           </div>
 
-          <div class="filter-chips-group">
-            <button class="filter-chip active" data-rarity="ALL">Toutes</button>
-            <button class="filter-chip" data-rarity="L">Légendaires</button>
-            <button class="filter-chip" data-rarity="UR">Ultra Rares</button>
-            <button class="filter-chip" data-rarity="SR">Super Rares</button>
-            <button class="filter-chip" data-rarity="R">Rares</button>
-            <button class="filter-chip" data-rarity="PC">Peu Communes</button>
-            <button class="filter-chip" data-rarity="C">Communes</button>
+          <div class="filter-chips-container">
+            <!-- FILTRE STATUT -->
+            <div class="filter-chips-group status-filter-group">
+              <span class="filter-group-label">Statut :</span>
+              <button class="filter-chip filter-chip-status active" data-status="ALL">Tous</button>
+              <button class="filter-chip filter-chip-status chip-sold" data-status="sold">🏷️ Vendu</button>
+              <button class="filter-chip filter-chip-status chip-traded" data-status="traded">🔄 Échangé</button>
+              <button class="filter-chip filter-chip-status chip-available" data-status="available">✨ Disponible</button>
+            </div>
+
+            <!-- FILTRE RARETÉ -->
+            <div class="filter-chips-group rarity-filter-group">
+              <span class="filter-group-label">Rareté :</span>
+              <button class="filter-chip filter-chip-rarity active" data-rarity="ALL">Toutes</button>
+              <button class="filter-chip filter-chip-rarity" data-rarity="L">Légendaires</button>
+              <button class="filter-chip filter-chip-rarity" data-rarity="UR">Ultra Rares</button>
+              <button class="filter-chip filter-chip-rarity" data-rarity="SR">Super Rares</button>
+              <button class="filter-chip filter-chip-rarity" data-rarity="R">Rares</button>
+              <button class="filter-chip filter-chip-rarity" data-rarity="PC">Peu Communes</button>
+              <button class="filter-chip filter-chip-rarity" data-rarity="C">Communes</button>
+            </div>
           </div>
 
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -586,29 +610,29 @@
             <div class="guide-step">
               <div class="guide-step-num">1</div>
               <div class="guide-step-content">
-                <h4>Télécharger l'extension</h4>
-                <p>Clonez ou téléchargez le dépôt GitHub <code>bzhkylian/WikiLogix</code>. Le dossier <code>extension/</code> contient tous les fichiers nécessaires.</p>
+                <h4>Télécharger l'extension (Bientôt sur le Chrome Web Store)</h4>
+                <p>L'extension WikiLogix sera bientôt disponible directement sur le <strong>Chrome Web Store / Marketplace</strong> pour une installation en 1 clic. En attendant, clonez ou téléchargez le dossier <code>extension/</code> depuis le dépôt GitHub <code>bzhkylian/WikiLogix</code>.</p>
               </div>
             </div>
             <div class="guide-step">
               <div class="guide-step-num">2</div>
               <div class="guide-step-content">
                 <h4>Charger dans Chrome</h4>
-                <p>Ouvrez <code>chrome://extensions</code>, activez le <strong>Mode développeur</strong> (haut droite), puis cliquez sur <strong>Charger l'extension non empaquetée</strong> et sélectionnez le dossier <code>extension/</code>.</p>
+                <p>Ouvrez <code>chrome://extensions</code>, activez le <strong>Mode développeur</strong> (en haut à droite), puis cliquez sur <strong>Charger l'extension non empaquetée</strong> et sélectionnez le dossier <code>extension/</code>.</p>
               </div>
             </div>
             <div class="guide-step">
               <div class="guide-step-num">3</div>
               <div class="guide-step-content">
-                <h4>Copier l'ID de l'extension</h4>
-                <p>Sur la page <code>chrome://extensions</code>, copiez l'ID affiché sous WikiLogix (ex: <code>efnmjlkgeebfkocflhbbpccohckckhbe</code>) et collez-le dans l'onglet <em>Liaison Extension</em> du dashboard.</p>
+                <h4>Dashboard Web 100% en Ligne (Aucun téléchargement requis)</h4>
+                <p>Le dashboard est directement accessible sur le Web via GitHub Pages à l'adresse <code>https://bzhkylian.github.io/WikiLogix/dashboard</code>. Vous n'avez rien à télécharger ni à installer localement pour visualiser vos données !</p>
               </div>
             </div>
             <div class="guide-step">
               <div class="guide-step-num">4</div>
               <div class="guide-step-content">
-                <h4>Se rendre sur Wiki-Masters</h4>
-                <p>Naviguez vers <code>wiki-masters.com/pulls</code>. L'extension s'active automatiquement et l'icône WikiLogix s'allume dans la barre Chrome.</p>
+                <h4>Lier l'Extension au Dashboard</h4>
+                <p>Sur <code>chrome://extensions</code>, copiez l'ID affiché sous WikiLogix (ex: <code>efnmjlkgeebfkocflhbbpccohckckhbe</code>) et collez-le dans l'onglet <em>Liaison Extension</em> du dashboard pour activer la synchronisation instantanée.</p>
               </div>
             </div>
           </div>
@@ -620,33 +644,45 @@
             <div class="guide-section-icon" style="background:rgba(255,225,68,0.1);">⚙️</div>
             <h3>Comment ça fonctionne ?</h3>
           </div>
+
+          <!-- AVERTISSEMENT WIKIMASTERS PRO -->
+          <div class="pro-requirement-banner">
+            <div class="pro-badge">⚠️ WIKIMASTERS PRO OBLIGATOIRE</div>
+            <div class="pro-content">
+              <h4>Abonnement WikiMasters Pro indispensable pour les prix du marché</h4>
+              <p>
+                Pour bénéficier de la détection automatique des prix, de la valorisation de vos tirages et des conseils de revente, <strong>il est indispensable de posséder un compte WikiMasters Pro</strong> (et non la version normale). Sans la version Pro, la plateforme Wiki-Masters n'affiche pas les données de marché et l'extension ne peut donc pas les récupérer.
+              </p>
+            </div>
+          </div>
+
           <div class="guide-feature-grid">
             <div class="guide-feature-item">
               <span class="fi-icon">👁️</span>
               <div>
                 <h4>Détection des Cartes</h4>
-                <p>Un <em>MutationObserver</em> surveille le DOM de Wiki-Masters en temps réel et détecte chaque nouvelle carte apparaissant lors d'une ouverture de booster.</p>
+                <p>Un <em>MutationObserver</em> surveille le DOM de Wiki-Masters en temps réel et détecte chaque nouvelle carte apparaissant lors de vos ouvertures de boosters.</p>
               </div>
             </div>
             <div class="guide-feature-item">
               <span class="fi-icon">💰</span>
               <div>
-                <h4>Extraction du Prix</h4>
-                <p>Pour chaque carte détectée, l'extension interroge le marché de Wiki-Masters pour récupérer automatiquement le prix moyen, min et max.</p>
+                <h4>Extraction des Cours (Pro)</h4>
+                <p>Pour chaque carte détectée, l'extension interroge le marché Wiki-Masters Pro pour récupérer automatiquement le prix moyen, minimum et maximum.</p>
               </div>
             </div>
             <div class="guide-feature-item">
               <span class="fi-icon">🖼️</span>
               <div>
-                <h4>Image Wikipédia</h4>
-                <p>L'extension extrait l'image principale de la carte depuis l'article Wikipédia correspondant (si disponible) et la stocke avec les données.</p>
+                <h4>Image &amp; Wikipédia</h4>
+                <p>L'extension capture l'illustration de la carte et génère le lien direct vers l'article Wikipédia correspondant pour consulter sa fiche détaillée.</p>
               </div>
             </div>
             <div class="guide-feature-item">
               <span class="fi-icon">💾</span>
               <div>
-                <h4>Stockage Local</h4>
-                <p>Toutes les cartes et configurations sont persistées dans le <code>chrome.storage.local</code> de l'extension, et synchronisées avec le dashboard via <code>externally_connectable</code>.</p>
+                <h4>Stockage Local &amp; Sync Web</h4>
+                <p>Vos cartes sont persistées en toute confidentialité dans le <code>chrome.storage.local</code> de votre navigateur et transmises au dashboard en ligne via <code>externally_connectable</code>.</p>
               </div>
             </div>
           </div>
@@ -656,28 +692,35 @@
         <div class="guide-section">
           <div class="guide-section-header">
             <div class="guide-section-icon" style="background:rgba(88,101,242,0.1);">📡</div>
-            <h3>Configuration Discord</h3>
+            <h3>Configuration Discord Pas à Pas</h3>
           </div>
           <div class="guide-steps-list">
             <div class="guide-step">
               <div class="guide-step-num">1</div>
               <div class="guide-step-content">
-                <h4>Créer un Webhook</h4>
-                <p>Dans Discord, allez dans les paramètres du salon → <strong>Intégrations</strong> → <strong>Webhooks</strong> → <strong>Nouveau webhook</strong>. Copiez l'URL générée.</p>
+                <h4>Créer un Serveur Discord (ou salon dédié)</h4>
+                <p>Créez votre propre serveur Discord (ou utilisez un salon privé sur un serveur existant sur lequel vous avez les permissions de gestion des webhooks).</p>
               </div>
             </div>
             <div class="guide-step">
               <div class="guide-step-num">2</div>
               <div class="guide-step-content">
-                <h4>Renseigner le Webhook</h4>
-                <p>Collez l'URL dans le champ <em>URL du Webhook Discord Principal</em> dans l'onglet <strong>Miroir Bot &amp; Discord</strong> du dashboard.</p>
+                <h4>Créer un Webhook</h4>
+                <p>Dans Discord, faites un clic droit sur le salon choisi → <strong>Modifier le salon</strong> → <strong>Intégrations</strong> → <strong>Webhooks</strong> → <strong>Nouveau webhook</strong>. Nommez-le par exemple <code>WikiLogix Drops</code> et cliquez sur <strong>Copier l'URL du webhook</strong>.</p>
               </div>
             </div>
             <div class="guide-step">
               <div class="guide-step-num">3</div>
               <div class="guide-step-content">
-                <h4>Configurer les Filtres</h4>
-                <p>Créez des règles de filtrage pour router les drops vers des fils Discord spécifiques selon la rareté (L, UR, SR...) ou le seuil de prix en 🪙.</p>
+                <h4>Renseigner l'URL dans WikiLogix</h4>
+                <p>Collez cette URL dans le champ <em>URL du Webhook Discord Principal</em> dans l'onglet <strong>Miroir Bot &amp; Discord</strong> du dashboard (ou directement dans le popup de l'extension) et enregistrez.</p>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">4</div>
+              <div class="guide-step-content">
+                <h4>Créer des Fils (Threads) &amp; Configurer les Filtres (Optionnel)</h4>
+                <p>Dans votre salon Discord, vous pouvez créer des fils de discussion (ex: <code>#légendaires</code>, <code>#ur-sr</code>). Configurez ensuite les règles dans le dashboard pour router automatiquement les drops vers le bon fil selon leur rareté ou leur valeur en 🪙.</p>
               </div>
             </div>
           </div>
@@ -691,26 +734,42 @@
           </div>
           <div class="faq-list" id="faq-list">
             <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Pourquoi les prix n'apparaissent-ils pas sur mes cartes ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Il est <strong>indispensable d'avoir un compte WikiMasters Pro</strong>. La version gratuite de WikiMasters ne met pas à disposition les prix du marché ni les statistiques de ventes. Sans abonnement Pro actif sur Wiki-Masters, l'extension ne peut donc pas récupérer ces cours.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Peut-on resynchroniser les cartes ou les prix passés ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner"><strong>La fonctionnalité de resynchronisation n'est pas encore implémentée pour le moment</strong> (elle n'est pas disponible actuellement). Elle sera introduite dans une future mise à jour. Pour le moment, les cartes et leurs cours sont automatiquement capturés en direct lors de chaque ouverture de booster.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
               <div class="faq-question">Pourquoi les cartes n'apparaissent-elles pas dans le dashboard ? <span class="faq-arrow">›</span></div>
-              <div class="faq-answer"><div class="faq-answer-inner">Vérifiez que l'ID de l'extension est correctement renseigné dans l'onglet <em>Liaison Extension</em>. Le dashboard doit être ouvert via une URL HTTP (localhost ou GitHub Pages) et non en <code>file://</code> pour que la liaison Chrome fonctionne.</div></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Vérifiez que l'ID de l'extension est correctement renseigné dans l'onglet <em>Liaison Extension</em>. Le dashboard doit être ouvert via une URL HTTP (GitHub Pages ou localhost) et non en <code>file://</code> pour que l'API Chrome <code>externally_connectable</code> puisse fonctionner.</div></div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
               <div class="faq-question">L'extension ne détecte pas mes cartes, que faire ? <span class="faq-arrow">›</span></div>
               <div class="faq-answer"><div class="faq-answer-inner">Assurez-vous d'être sur la page <code>wiki-masters.com/pulls</code>. Si le problème persiste, rechargez la page et vérifiez que l'extension est bien activée dans <code>chrome://extensions</code>.</div></div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-question">Comment filtrer les cartes vendues ou échangées ? <span class="faq-arrow">›</span></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Dans l'onglet <em>Historique des Cartes</em>, utilisez la nouvelle barre de filtre <strong>Statut</strong> au-dessus du tableau pour afficher en un clic les cartes <strong>Tous</strong>, <strong>🏷️ Vendu</strong>, <strong>🔄 Échangé</strong> ou <strong>✨ Disponible</strong>.</div></div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
               <div class="faq-question">Comment supprimer une carte du cache ? <span class="faq-arrow">›</span></div>
-              <div class="faq-answer"><div class="faq-answer-inner">Dans l'onglet <em>Historique des Cartes</em>, cliquez sur <strong>Détails</strong> d'une carte puis sur le bouton rouge <strong>Supprimer</strong>. La carte sera retirée définitivement du cache local.</div></div>
-            </div>
-            <div class="faq-item" onclick="this.classList.toggle('open')">
-              <div class="faq-question">Que signifient les boutons Vendu / Échangé ? <span class="faq-arrow">›</span></div>
-              <div class="faq-answer"><div class="faq-answer-inner">Ces boutons ajoutent un tag visuel sur la carte pour indiquer qu'elle n'est plus disponible dans votre collection. Cela évite de la rechercher inutilement. La carte reste dans l'historique avec son tag coloré.</div></div>
-            </div>
-            <div class="faq-item" onclick="this.classList.toggle('open')">
-              <div class="faq-question">Les prix affichés sont-ils en temps réel ? <span class="faq-arrow">›</span></div>
-              <div class="faq-answer"><div class="faq-answer-inner">Les prix sont capturés au moment du tirage par l'extension. Ils correspondent au prix de marché au moment de l'ouverture du booster. Pour les actualiser, une synchronisation manuelle est possible depuis le popup de l'extension.</div></div>
+              <div class="faq-answer"><div class="faq-answer-inner">Dans l'onglet <em>Historique des Cartes</em>, cliquez sur <strong>Détails</strong> d'une carte puis sur le bouton rouge <strong>Supprimer</strong>. La carte sera retirée définitivement du cache local après confirmation.</div></div>
             </div>
           </div>
+        </div>
+
+        <!-- BANNIÈRE DISCORD COMMUNAUTAIRE -->
+        <div class="guide-discord-banner">
+          <div class="guide-discord-content">
+            <h3>💬 Rejoignez la Communauté WikiLogix</h3>
+            <p>Une question, un bug ou une idée d'amélioration ? Rejoignez notre serveur Discord pour échanger avec la communauté et suivre les nouveautés !</p>
+          </div>
+          <a href="https://discord.gg/wikilogix" target="_blank" rel="noopener" class="btn btn-discord btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+            Rejoindre le Discord
+          </a>
         </div>
       </section>
 

@@ -1508,8 +1508,6 @@
     isAutoSyncActive: false,
     autoSyncInterval: null,
     syncFrequencySec: 5,
-    isSimulationMode: false,
-    simulationInterval: null,
     connectionStatus: 'disconnected',
 
     cards: [],
@@ -1519,6 +1517,7 @@
 
     searchQuery: '',
     selectedRarity: 'ALL',
+    selectedStatus: 'ALL',
     sortColumn: 'timestamp',
     sortDirection: 'desc',
     currentPage: 1,
@@ -1775,12 +1774,25 @@
       });
     }
 
-    const chips = document.querySelectorAll('.filter-chip');
-    chips.forEach((chip) => {
+    // Filtres par rareté
+    const rarityChips = document.querySelectorAll('.filter-chip-rarity, .filter-chip[data-rarity]');
+    rarityChips.forEach((chip) => {
       chip.addEventListener('click', () => {
-        chips.forEach((c) => c.classList.remove('active'));
+        rarityChips.forEach((c) => c.classList.remove('active'));
         chip.classList.add('active');
         state.selectedRarity = chip.getAttribute('data-rarity') || 'ALL';
+        state.currentPage = 1;
+        renderCardsTable();
+      });
+    });
+
+    // Filtres par statut (Tous, Vendu, Échangé, Disponible)
+    const statusChips = document.querySelectorAll('.filter-chip-status, .filter-chip[data-status]');
+    statusChips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        statusChips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.selectedStatus = chip.getAttribute('data-status') || 'ALL';
         state.currentPage = 1;
         renderCardsTable();
       });
@@ -1822,6 +1834,14 @@
 
     if (state.selectedRarity !== 'ALL') {
       list = list.filter((c) => c.rarity === state.selectedRarity);
+    }
+
+    if (state.selectedStatus === 'sold') {
+      list = list.filter((c) => c.status === 'sold');
+    } else if (state.selectedStatus === 'traded') {
+      list = list.filter((c) => c.status === 'traded');
+    } else if (state.selectedStatus === 'available') {
+      list = list.filter((c) => !c.status);
     }
 
     list.sort((a, b) => {
@@ -1901,11 +1921,30 @@
           ? '<span class="card-status-badge traded tag-traded">🔄 Échangé</span>'
           : '';
 
+      const rawImgUrl = card.imageUrl || card.image || card.img || '';
+      const isFakeThumb = !rawImgUrl || (
+        rawImgUrl.includes('favicon') ||
+        rawImgUrl.includes('/icon/') ||
+        rawImgUrl.endsWith('/icon.png') ||
+        (rawImgUrl.endsWith('.png') && (
+          rawImgUrl.includes('commun') ||
+          rawImgUrl.includes('rare') ||
+          rawImgUrl.includes('legendaire') ||
+          rawImgUrl.includes('avatar')
+        ))
+      );
+
+      const thumbHtml = !isFakeThumb
+        ? `<img src="${rawImgUrl}" alt="" class="table-card-thumb" onerror="this.style.display='none'">`
+        : `<span class="gem-dot" style="background: ${meta.color}; box-shadow: 0 0 8px ${meta.glowColor};"></span>`;
+
       tr.innerHTML = `
         <td>
           <div class="table-card-title">
-            <span class="gem-dot" style="background: ${meta.color}; box-shadow: 0 0 8px ${meta.glowColor};"></span>
-            <strong>${card.name}</strong>${statusBadge}
+            ${thumbHtml}
+            <div class="table-card-name-group">
+              <strong>${card.name}</strong>${statusBadge}
+            </div>
           </div>
         </td>
         <td>
@@ -1950,52 +1989,83 @@
       infoEl.textContent = total > 0 ? 'Affichage ' + start + ' à ' + end + ' sur ' + total + ' cartes' : '0 cartes';
     }
 
-    if (controlsEl) {
-      controlsEl.innerHTML = '';
+    if (!controlsEl) return;
+    controlsEl.innerHTML = '';
 
-      const prevBtn = document.createElement('button');
-      prevBtn.className = 'page-btn';
-      prevBtn.innerHTML = '‹';
-      prevBtn.disabled = state.currentPage <= 1;
-      prevBtn.addEventListener('click', () => {
-        if (state.currentPage > 1) {
-          state.currentPage--;
-          renderCardsTable();
-        }
-      });
-      controlsEl.appendChild(prevBtn);
+    if (totalPages <= 1) return;
 
-      for (let p = 1; p <= totalPages; p++) {
-        if (p === 1 || p === totalPages || (p >= state.currentPage - 1 && p <= state.currentPage + 1)) {
-          const pageBtn = document.createElement('button');
-          pageBtn.className = 'page-btn' + (p === state.currentPage ? ' active' : '');
-          pageBtn.textContent = String(p);
-          pageBtn.addEventListener('click', () => {
-            state.currentPage = p;
-            renderCardsTable();
-          });
-          controlsEl.appendChild(pageBtn);
-        } else if (p === state.currentPage - 2 || p === state.currentPage + 2) {
-          const dots = document.createElement('span');
-          dots.style.padding = '0 4px';
-          dots.style.color = '#64748b';
-          dots.textContent = '...';
-          controlsEl.appendChild(dots);
-        }
+    // Bouton Précédent
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'pagination-btn';
+    prevBtn.disabled = state.currentPage === 1;
+    prevBtn.innerHTML = '&lsaquo;';
+    prevBtn.title = 'Page précédente';
+    prevBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        state.currentPage--;
+        renderCardsTable();
       }
+    });
+    controlsEl.appendChild(prevBtn);
 
-      const nextBtn = document.createElement('button');
-      nextBtn.className = 'page-btn';
-      nextBtn.innerHTML = '›';
-      nextBtn.disabled = state.currentPage >= totalPages;
-      nextBtn.addEventListener('click', () => {
-        if (state.currentPage < totalPages) {
-          state.currentPage++;
-          renderCardsTable();
-        }
-      });
-      controlsEl.appendChild(nextBtn);
+    // Numéros de page
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, state.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
+
+    if (startPage > 1) {
+      const p1 = createPageBtn(1);
+      controlsEl.appendChild(p1);
+      if (startPage > 2) {
+        const dots = document.createElement('span');
+        dots.style.color = 'var(--text-muted)';
+        dots.textContent = '...';
+        controlsEl.appendChild(dots);
+      }
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+      controlsEl.appendChild(createPageBtn(p));
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const dots = document.createElement('span');
+        dots.style.color = 'var(--text-muted)';
+        dots.textContent = '...';
+        controlsEl.appendChild(dots);
+      }
+      controlsEl.appendChild(createPageBtn(totalPages));
+    }
+
+    // Bouton Suivant
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'pagination-btn';
+    nextBtn.disabled = state.currentPage === totalPages;
+    nextBtn.innerHTML = '&rsaquo;';
+    nextBtn.title = 'Page suivante';
+    nextBtn.addEventListener('click', () => {
+      if (state.currentPage < totalPages) {
+        state.currentPage++;
+        renderCardsTable();
+      }
+    });
+    controlsEl.appendChild(nextBtn);
+  }
+
+  function createPageBtn(pageNum) {
+    const btn = document.createElement('button');
+    btn.className = 'pagination-btn' + (pageNum === state.currentPage ? ' active' : '');
+    btn.textContent = pageNum;
+    btn.addEventListener('click', () => {
+      state.currentPage = pageNum;
+      renderCardsTable();
+    });
+    return btn;
   }
 
   // ==========================================================================
@@ -2035,11 +2105,17 @@
     // --- IMAGE DE LA CARTE ---
     const imgEl = document.getElementById('modal-card-img');
     const placeholderEl = document.getElementById('modal-card-placeholder');
-    const imageUrl = card.imageUrl || card.image || null;
+    const imageUrl = card.imageUrl || card.image || card.img || null;
     const isWikimastersDefault = imageUrl && (
-      imageUrl.includes('wiki-masters.com') ||
-      imageUrl.includes('/icon') ||
-      imageUrl.endsWith('.png') && (imageUrl.includes('commun') || imageUrl.includes('rare') || imageUrl.includes('legendaire'))
+      imageUrl.includes('favicon') ||
+      imageUrl.includes('/icon/') ||
+      imageUrl.endsWith('/icon.png') ||
+      (imageUrl.endsWith('.png') && (
+        imageUrl.includes('commun') ||
+        imageUrl.includes('rare') ||
+        imageUrl.includes('legendaire') ||
+        imageUrl.includes('avatar')
+      ))
     );
 
     if (imgEl && placeholderEl) {
@@ -2710,39 +2786,8 @@
   }
 
   // ==========================================================================
-  // 12. SIMULATION EN DIRECT & ÉCOUTEURS D'ÉVÉNEMENTS GLOBAUX
+  // 12. ÉCOUTEURS D'ÉVÉNEMENTS GLOBAUX
   // ==========================================================================
-
-  function toggleSimulationMode(enable) {
-    state.isSimulationMode = enable;
-
-    if (enable) {
-      setConnectionStatus('simulation');
-      logBridgeMessage('Démarrage du flux de simulation en temps réel...', 'info');
-      showToast('Simulation en direct activée : tirages générés en temps réel.', 'info');
-
-      let simCardCounter = state.cards.length + 1;
-      state.simulationInterval = setInterval(() => {
-        const newCard = generateRandomSimulationCard(simCardCounter++);
-        state.cards.push(newCard);
-        updateDashboardData();
-
-        const matching = findMatchingRules(newCard, state.discordConfig.rules);
-        const matchInfo = matching.length > 0 ? ` (Filtre actif : "${matching[0].name}")` : '';
-        logBridgeMessage(`Tirage simulé : [${newCard.rarity}] ${newCard.name} (+${newCard.avgPrice} 🪙)${matchInfo}`, 'success');
-
-        if (newCard.rarity === 'L' || newCard.rarity === 'UR') {
-          showToast(`🌟 Drop Majeur ! [${newCard.rarity}] ${newCard.name} (${newCard.avgPrice} 🪙)`, 'success');
-        }
-      }, 3500);
-    } else {
-      if (state.simulationInterval) clearInterval(state.simulationInterval);
-      state.simulationInterval = null;
-      setConnectionStatus('disconnected');
-      logBridgeMessage('Flux de simulation arrêté.', 'warn');
-      showToast('Simulation en direct désactivée.', 'info');
-    }
-  }
 
   function initEventListeners() {
     const btnSyncManual = document.getElementById('btn-sync-now');
@@ -2779,15 +2824,6 @@
           showToast('ID Extension sauvegardé !', 'success');
           syncWithExtension(true);
         }
-      });
-    }
-
-    const btnToggleSim = document.getElementById('btn-toggle-simulation');
-    if (btnToggleSim) {
-      btnToggleSim.addEventListener('click', () => {
-        toggleSimulationMode(!state.isSimulationMode);
-        btnToggleSim.textContent = state.isSimulationMode ? 'Arrêter la Simulation' : 'Lancer Simulation Directe';
-        btnToggleSim.className = state.isSimulationMode ? 'btn btn-danger btn-sm' : 'btn btn-secondary btn-sm';
       });
     }
 
