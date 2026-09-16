@@ -2636,3 +2636,112 @@ input:checked + .slider:before {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.35; transform: scale(0.85); }
 }
+
+/* ============================================================================
+   TABLEAU RÉCAPITULATIF QUOTIDIEN DES GAINS ET DU RENDEMENT
+   ============================================================================ */
+
+.daily-summary-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-summary-stats-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cyber-cyan);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.daily-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.daily-summary-table th {
+  padding: 12px 14px;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-glass);
+  background: rgba(10, 14, 26, 0.7);
+  white-space: nowrap;
+}
+
+.daily-summary-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+}
+
+.daily-summary-table tbody tr {
+  transition: background 0.18s ease;
+}
+
+.daily-summary-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.day-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.day-badge.badge-today {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--cyber-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
+}
+
+.day-badge.badge-yesterday {
+  background: rgba(6, 182, 212, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.daily-rarity-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.btn-filter-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-filter-day:hover {
+  background: rgba(6, 182, 212, 0.22);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+  transform: translateY(-1px);
+}
+

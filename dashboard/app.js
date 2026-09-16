@@ -111,7 +111,7 @@
       sellPriceMid: 1781,
       salesCount: 14,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 180
+      timestamp: Date.now() - (4 * 86400000 + 1000 * 60 * 180)
     },
     {
       id: 'card_demo_02',
@@ -136,7 +136,7 @@
       sellPriceMid: 906,
       salesCount: 22,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 179
+      timestamp: Date.now() - (4 * 86400000 + 1000 * 60 * 179)
     },
     {
       id: 'card_demo_03',
@@ -161,7 +161,7 @@
       sellPriceMid: 700,
       salesCount: 19,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 178
+      timestamp: Date.now() - (4 * 86400000 + 1000 * 60 * 178)
     },
     {
       id: 'card_demo_04',
@@ -186,7 +186,7 @@
       sellPriceMid: 263,
       salesCount: 45,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 177
+      timestamp: Date.now() - (4 * 86400000 + 1000 * 60 * 177)
     },
     {
       id: 'card_demo_05',
@@ -211,7 +211,7 @@
       sellPriceMid: 1938,
       salesCount: 8,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 176
+      timestamp: Date.now() - (4 * 86400000 + 1000 * 60 * 176)
     },
     {
       id: 'card_demo_06',
@@ -236,7 +236,7 @@
       sellPriceMid: 238,
       salesCount: 31,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 140
+      timestamp: Date.now() - (3 * 86400000 + 1000 * 60 * 140)
     },
     {
       id: 'card_demo_07',
@@ -261,7 +261,7 @@
       sellPriceMid: 113,
       salesCount: 58,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 139
+      timestamp: Date.now() - (3 * 86400000 + 1000 * 60 * 139)
     },
     {
       id: 'card_demo_08',
@@ -286,7 +286,7 @@
       sellPriceMid: 556,
       salesCount: 27,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 138
+      timestamp: Date.now() - (3 * 86400000 + 1000 * 60 * 138)
     },
     {
       id: 'card_demo_09',
@@ -311,7 +311,7 @@
       sellPriceMid: 88,
       salesCount: 72,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 137
+      timestamp: Date.now() - (3 * 86400000 + 1000 * 60 * 137)
     },
     {
       id: 'card_demo_10',
@@ -336,7 +336,7 @@
       sellPriceMid: 28,
       salesCount: 110,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 136
+      timestamp: Date.now() - (3 * 86400000 + 1000 * 60 * 136)
     },
     {
       id: 'card_demo_11',
@@ -361,7 +361,7 @@
       sellPriceMid: 3000,
       salesCount: 4,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 95
+      timestamp: Date.now() - (2 * 86400000 + 1000 * 60 * 95)
     },
     {
       id: 'card_demo_12',
@@ -386,7 +386,7 @@
       sellPriceMid: 219,
       salesCount: 38,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 94
+      timestamp: Date.now() - (2 * 86400000 + 1000 * 60 * 94)
     },
     {
       id: 'card_demo_13',
@@ -411,7 +411,7 @@
       sellPriceMid: 100,
       salesCount: 65,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 93
+      timestamp: Date.now() - (2 * 86400000 + 1000 * 60 * 93)
     },
     {
       id: 'card_demo_14',
@@ -436,7 +436,7 @@
       sellPriceMid: 1625,
       salesCount: 12,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 92
+      timestamp: Date.now() - (2 * 86400000 + 1000 * 60 * 92)
     },
     {
       id: 'card_demo_15',
@@ -461,7 +461,7 @@
       sellPriceMid: 22,
       salesCount: 140,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 91
+      timestamp: Date.now() - (2 * 86400000 + 1000 * 60 * 91)
     },
     {
       id: 'card_demo_16',
@@ -486,7 +486,7 @@
       sellPriceMid: 256,
       salesCount: 34,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 50
+      timestamp: Date.now() - (1 * 86400000 + 1000 * 60 * 50)
     },
     {
       id: 'card_demo_17',
@@ -511,7 +511,7 @@
       sellPriceMid: 122,
       salesCount: 52,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 49
+      timestamp: Date.now() - (1 * 86400000 + 1000 * 60 * 49)
     },
     {
       id: 'card_demo_18',
@@ -536,7 +536,7 @@
       sellPriceMid: 588,
       salesCount: 25,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 48
+      timestamp: Date.now() - (1 * 86400000 + 1000 * 60 * 48)
     },
     {
       id: 'card_demo_19',
@@ -561,7 +561,7 @@
       sellPriceMid: 24,
       salesCount: 125,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 47
+      timestamp: Date.now() - (1 * 86400000 + 1000 * 60 * 47)
     },
     {
       id: 'card_demo_20',
@@ -586,7 +586,7 @@
       sellPriceMid: 11,
       salesCount: 210,
       hasRealMarketPrice: true,
-      timestamp: Date.now() - 1000 * 60 * 46
+      timestamp: Date.now() - (1 * 86400000 + 1000 * 60 * 46)
     },
     {
       id: 'card_demo_21',
@@ -950,10 +950,12 @@
       if (!pt) return;
 
       const posX = padding.left + this.hoverIndex * stepX;
-      const dateStr = new Date(pt.timestamp).toLocaleTimeString('fr-FR', {
+      const dateStr = new Date(pt.timestamp).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+        minute: '2-digit'
       });
 
       this.tooltip.innerHTML = `
@@ -1118,7 +1120,9 @@
 
       for (let i = 0; i < this.dataPoints.length; i += labelStep) {
         const x = padding.left + i * stepX;
-        ctx.fillText('Carte #' + (i + 1), x, height - 15);
+        const pt = this.dataPoints[i];
+        const dateStr = pt && pt.timestamp ? new Date(pt.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) : '';
+        ctx.fillText(dateStr ? `${dateStr} (#${i + 1})` : 'Carte #' + (i + 1), x, height - 15);
       }
     }
   }
@@ -1508,7 +1512,7 @@
       this.canvas = document.getElementById(canvasId);
       this.tooltip = document.getElementById(tooltipId);
       this.cards = [];
-      this.currentView = 'hourly'; // 'hourly' | 'daily'
+      this.currentView = 'daily'; // 'daily' | 'hourly'
       this.aggregatedData = [];
       this.hoverIndex = -1;
       this.animationProgress = 1;
@@ -2070,6 +2074,7 @@
     searchQuery: '',
     selectedRarity: 'ALL',
     selectedStatus: 'ALL',
+    selectedDate: 'ALL',
     sortColumn: 'timestamp',
     sortDirection: 'desc',
     currentPage: 1,
@@ -2092,6 +2097,11 @@
     if (savedCards) {
       try {
         state.cards = JSON.parse(savedCards);
+        // Si les cartes stockées sont uniquement les 25 cartes mock de démonstration,
+        // les rafraîchir avec la répartition multi-jours
+        if (Array.isArray(state.cards) && state.cards.length === 25 && state.cards.every((c) => c.id && c.id.startsWith('card_demo_'))) {
+          state.cards = [...INITIAL_MOCK_CARDS];
+        }
       } catch (_) {
         state.cards = [...INITIAL_MOCK_CARDS];
       }
@@ -2187,6 +2197,233 @@
     };
   }
 
+  // ==========================================================================
+  // 5.2. AGRÉGATION CALENDAIRE PAR JOUR (JJ/MM/AAAA) & RÉCAPITULATIF
+  // ==========================================================================
+
+  function getDailyAggregatedStats(cards) {
+    if (!Array.isArray(cards) || cards.length === 0) return [];
+
+    const dayMap = new Map();
+
+    cards.forEach((card) => {
+      let ts = card.timestamp;
+      if (typeof ts === 'string') ts = new Date(ts).getTime();
+      if (!ts || isNaN(ts)) ts = Date.now();
+
+      const d = new Date(ts);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const dateFR = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+      const dateLong = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+      if (!dayMap.has(dateKey)) {
+        dayMap.set(dateKey, {
+          dateKey,
+          dateFR,
+          dateLong,
+          dObj: new Date(d.getFullYear(), d.getMonth(), d.getDate()),
+          cards: [],
+          totalCards: 0,
+          totalBoosters: 0,
+          totalGross: 0,
+          totalSellMin: 0,
+          totalSellMax: 0,
+          totalNet: 0,
+          topCard: null,
+          rarityCounts: { L: 0, UR: 0, SR: 0, R: 0, PC: 0, C: 0 }
+        });
+      }
+
+      const dayData = dayMap.get(dateKey);
+      dayData.cards.push(card);
+      dayData.totalCards++;
+
+      const gross = Number(card.avgPrice || card.suggestedPrice || 0);
+      const minSell = card.sellPriceMin || Math.round(gross * 0.50);
+      const maxSell = card.sellPriceMax || Math.round(gross * 0.75);
+      const net = Math.round((minSell + maxSell) / 2);
+
+      dayData.totalGross += gross;
+      dayData.totalSellMin += minSell;
+      dayData.totalSellMax += maxSell;
+      dayData.totalNet += net;
+
+      const r = card.rarity || 'C';
+      if (dayData.rarityCounts[r] !== undefined) {
+        dayData.rarityCounts[r]++;
+      }
+
+      if (!dayData.topCard || gross > Number(dayData.topCard.avgPrice || dayData.topCard.suggestedPrice || 0)) {
+        dayData.topCard = card;
+      }
+    });
+
+    const list = Array.from(dayMap.values()).map((day) => {
+      day.totalBoosters = Math.max(1, Math.ceil(day.totalCards / 5));
+      return day;
+    });
+
+    // Tri décroissant (le jour le plus récent en tête)
+    list.sort((a, b) => b.dObj - a.dObj);
+    return list;
+  }
+
+  function filterCardsByDate(dateKey) {
+    state.selectedDate = dateKey;
+    const select = document.getElementById('table-date-filter');
+    if (select) select.value = dateKey;
+
+    const navBtn = document.querySelector('.nav-tab-btn[data-target="tab-cards"]');
+    if (navBtn) navBtn.click();
+
+    state.currentPage = 1;
+    renderCardsTable();
+
+    const dObj = new Date(dateKey);
+    const dateLabel = isNaN(dObj.getTime()) ? dateKey : dObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    showToast(`Historique filtré sur la journée du ${dateLabel}`, 'info');
+  }
+
+  function renderDailySummaryTable() {
+    const tbody = document.getElementById('daily-summary-table-body');
+    const countBadge = document.getElementById('daily-total-days-count');
+    const dateSelect = document.getElementById('table-date-filter');
+    if (!tbody) return;
+
+    const dailyList = getDailyAggregatedStats(state.cards);
+
+    if (countBadge) {
+      countBadge.textContent = `${dailyList.length} jour${dailyList.length > 1 ? 's' : ''} enregistré${dailyList.length > 1 ? 's' : ''}`;
+    }
+
+    // Mettre à jour le sélecteur de filtre de dates dans l'onglet des cartes
+    if (dateSelect) {
+      const currentVal = state.selectedDate || 'ALL';
+      let optionsHtml = '<option value="ALL">📅 Toutes les dates (Historique complet)</option>';
+      dailyList.forEach((day) => {
+        optionsHtml += `<option value="${day.dateKey}">📅 ${day.dateFR} (${day.totalCards} cartes · ${day.totalGross.toLocaleString('fr-FR')} 🪙)</option>`;
+      });
+      dateSelect.innerHTML = optionsHtml;
+      dateSelect.value = currentVal;
+    }
+
+    if (dailyList.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-muted);">
+            Aucune donnée de tirage enregistrée pour le moment.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const yesterdayObj = new Date(now.getTime() - 86400000);
+    const yesterdayKey = `${yesterdayObj.getFullYear()}-${String(yesterdayObj.getMonth() + 1).padStart(2, '0')}-${String(yesterdayObj.getDate()).padStart(2, '0')}`;
+
+    tbody.innerHTML = '';
+
+    dailyList.forEach((day) => {
+      const isToday = day.dateKey === todayKey;
+      const isYesterday = day.dateKey === yesterdayKey;
+
+      let dateBadge = '';
+      if (isToday) {
+        dateBadge = '<span class="day-badge badge-today">Aujourd\'hui</span>';
+      } else if (isYesterday) {
+        dateBadge = '<span class="day-badge badge-yesterday">Hier</span>';
+      }
+
+      // Pastilles des raretés obtenues ce jour
+      const rarityPillsHtml = ['L', 'UR', 'SR', 'R', 'PC', 'C']
+        .filter((r) => (day.rarityCounts[r] || 0) > 0)
+        .map((r) => {
+          const meta = OFFICIAL_RARITIES[r];
+          return `<span class="daily-rarity-pill" style="color: ${meta.color}; background: ${meta.bgColor}; border: 1px solid ${meta.borderColor};" title="${meta.label}: ${day.rarityCounts[r]}">
+            ${r}: ${day.rarityCounts[r]}
+          </span>`;
+        })
+        .join('');
+
+      // Meilleur drop du jour
+      let topDropHtml = '<span style="color: var(--text-muted); font-size: 12px;">--</span>';
+      if (day.topCard) {
+        const tMeta = OFFICIAL_RARITIES[day.topCard.rarity] || OFFICIAL_RARITIES.C;
+        const tPrice = Number(day.topCard.avgPrice || day.topCard.suggestedPrice || 0);
+        topDropHtml = `
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="rarity-badge" style="background: ${tMeta.bgColor}; color: ${tMeta.color}; border: 1px solid ${tMeta.borderColor}; font-size: 10px; padding: 2px 6px;">
+              ${tMeta.shortCode}
+            </span>
+            <span style="font-weight: 600; font-size: 12.5px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${day.topCard.name}">
+              ${day.topCard.name}
+            </span>
+            <span style="color: #ffe144; font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+              ${tPrice.toLocaleString('fr-FR')} 🪙
+            </span>
+          </div>
+        `;
+      }
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <strong style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary);">${day.dateFR}</strong>
+              ${dateBadge}
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted); text-transform: capitalize;">${day.dateLong}</span>
+          </div>
+        </td>
+        <td>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 600; color: #38bdf8;">~${day.totalBoosters} booster(s)</span>
+            <span style="font-size: 11px; color: var(--text-muted);">${day.totalCards} cartes</span>
+          </div>
+        </td>
+        <td>
+          <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffe144; font-size: 13px;">
+            +${day.totalGross.toLocaleString('fr-FR')} 🪙
+          </span>
+        </td>
+        <td>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #10b981; font-size: 12.5px;">
+              ${day.totalSellMin.toLocaleString('fr-FR')} - ${day.totalSellMax.toLocaleString('fr-FR')} 🪙
+            </span>
+            <span style="font-size: 10px; color: var(--text-muted);">Médiane ~${day.totalNet.toLocaleString('fr-FR')} 🪙</span>
+          </div>
+        </td>
+        <td>
+          ${topDropHtml}
+        </td>
+        <td>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap; max-width: 200px;">
+            ${rarityPillsHtml || '<span style="color: var(--text-muted); font-size: 11px;">-</span>'}
+          </div>
+        </td>
+        <td>
+          <button type="button" class="btn-filter-day" data-date="${day.dateKey}" title="Filtrer les cartes du ${day.dateFR}">
+            🔍 Filtrer
+          </button>
+        </td>
+      `;
+
+      const btnFilter = tr.querySelector('.btn-filter-day');
+      if (btnFilter) {
+        btnFilter.addEventListener('click', () => {
+          filterCardsByDate(day.dateKey);
+        });
+      }
+
+      tbody.appendChild(tr);
+    });
+  }
+
+
   function updateDashboardData() {
     const stats = calculateStats();
 
@@ -2256,6 +2493,7 @@
       elHighTierRate.textContent = highTierRate + '%';
     }
 
+    renderDailySummaryTable();
     renderCardsTable();
     persistData();
 
@@ -2331,6 +2569,15 @@
       });
     }
 
+    const dateFilterSelect = document.getElementById('table-date-filter');
+    if (dateFilterSelect) {
+      dateFilterSelect.addEventListener('change', (e) => {
+        state.selectedDate = e.target.value;
+        state.currentPage = 1;
+        renderCardsTable();
+      });
+    }
+
     // Filtres par rareté
     const rarityChips = document.querySelectorAll('.filter-chip-rarity, .filter-chip[data-rarity]');
     rarityChips.forEach((chip) => {
@@ -2399,6 +2646,17 @@
       list = list.filter((c) => c.status === 'traded');
     } else if (state.selectedStatus === 'available') {
       list = list.filter((c) => !c.status);
+    }
+
+    if (state.selectedDate && state.selectedDate !== 'ALL') {
+      list = list.filter((c) => {
+        let ts = c.timestamp;
+        if (typeof ts === 'string') ts = new Date(ts).getTime();
+        if (!ts) return false;
+        const d = new Date(ts);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return key === state.selectedDate;
+      });
     }
 
     list.sort((a, b) => {

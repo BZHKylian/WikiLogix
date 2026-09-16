@@ -136,10 +136,12 @@ export class CumulativeGainsChart {
     if (!pt) return;
 
     const posX = padding.left + this.hoverIndex * stepX;
-    const dateStr = new Date(pt.timestamp).toLocaleTimeString('fr-FR', {
+    const dateStr = new Date(pt.timestamp).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
     });
 
     this.tooltip.innerHTML = `
@@ -744,7 +746,7 @@ export class BoosterYieldTemporalChart {
     this.canvas = document.getElementById(canvasId);
     this.tooltip = document.getElementById(tooltipId);
     this.cards = [];
-    this.currentView = 'hourly'; // 'hourly' | 'daily'
+    this.currentView = 'daily'; // 'daily' | 'hourly'
     this.aggregatedData = [];
     this.hoverIndex = -1;
     this.animationProgress = 1;
