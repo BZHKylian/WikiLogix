@@ -343,6 +343,61 @@
             </div>
           </div>
         </div>
+
+        <!-- NOUVEAU GRAPHIQUE TEMPOREL : RENDEMENT DES BOOSTERS (TIMERS GRATUITS) -->
+        <div class="chart-card booster-yield-card" style="margin-top: 24px;">
+          <div class="chart-card-header">
+            <div class="chart-title-box">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <h3>Analyse Temporelle &amp; Rendement des Boosters</h3>
+                <span class="badge-pill-neon">TIMERS GRATUITS</span>
+              </div>
+              <p>Évolution chronologique de la valeur brute cumulée (🪙) et du rendement net estimé à la revente</p>
+            </div>
+            <!-- SÉLECTEUR DE PÉRIODE (HEURE / JOUR) -->
+            <div class="chart-time-selector" id="booster-yield-selector">
+              <button type="button" class="time-tab-btn active" data-view="hourly" id="btn-view-hourly" title="Détail de la journée par heure">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Aujourd'hui (Par Heure)
+              </button>
+              <button type="button" class="time-tab-btn" data-view="daily" id="btn-view-daily" title="Historique global jour par jour">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Historique (Par Jour)
+              </button>
+            </div>
+          </div>
+
+          <!-- BARRE DE STATISTIQUES RAPIDES & LÉGENDE DU GRAPHIQUE -->
+          <div class="yield-chart-legend-bar">
+            <div class="yield-legend-group">
+              <div class="yield-legend-item">
+                <span class="yield-legend-line" style="background: #ffe144; box-shadow: 0 0 8px rgba(255, 225, 68, 0.6);"></span>
+                <span class="yield-legend-label">Valeur Brute Cumulée :</span>
+                <strong class="yield-legend-value" id="yield-stat-gross" style="color: #ffe144;">0 🪙</strong>
+              </div>
+              <div class="yield-legend-item">
+                <span class="yield-legend-line" style="background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
+                <span class="yield-legend-label">Revente Nette Estimée (50-75%) :</span>
+                <strong class="yield-legend-value" id="yield-stat-net" style="color: #10b981;">0 🪙</strong>
+              </div>
+              <div class="yield-legend-item">
+                <span class="yield-legend-bar" style="background: rgba(6, 182, 212, 0.5); border: 1px solid #06b6d4;"></span>
+                <span class="yield-legend-label">Drops par intervalle :</span>
+                <strong class="yield-legend-value" id="yield-stat-drop" style="color: #06b6d4;">Pics d'ouverture</strong>
+              </div>
+            </div>
+            <div class="yield-session-badge" id="yield-session-info">
+              <span class="pulse-dot"></span>
+              <span id="yield-current-view-label">Vue 24h Intra-journalière</span>
+            </div>
+          </div>
+
+          <!-- CANVAS GRAPHIQUE & TOOLTIP -->
+          <div class="canvas-container" style="height: 320px; position: relative;">
+            <canvas id="canvas-booster-yield"></canvas>
+            <div class="custom-chart-tooltip" id="tooltip-booster-yield"></div>
+          </div>
+        </div>
       </section>
 
       <!-- ==================================================================

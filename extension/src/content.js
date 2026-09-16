@@ -649,113 +649,103 @@
   }
 
   /**
-   * Automatise la détection de la rareté de la carte et le clic sur le filtre
-   * correspondant dans le panneau Marché de Wiki-Masters.
-   *
-   * @param {HTMLElement} [modal=document] - L'élément racine de la modale (.card-frame ou div parent)
-   * @param {string|null} [fallbackRarity=null] - Rareté de secours si le badge DOM est absent
-   * @param {number} [refreshWaitMs=150] - Délai d'attente pour la mise à jour React du DOM (100-200ms)
-   * @returns {Promise<{ success: boolean, rarity: string|null, updated: boolean }>}
+   * Identifie le code de rareté d'un bouton de filtre ou retourne 'ALL' pour "Toutes".
    */
-  async function autoFilterMarketRarity(modal = document, fallbackRarity = null, refreshWaitMs = 150) {
-    if (!modal) return { success: false, rarity: null, updated: false };
+  function getButtonRarityCode(btn) {
+    if (!btn) return null;
+    const txt = (btn.textContent || btn.innerText || '').trim().toLowerCase();
+    if (!txt) return null;
+    if (txt.includes('toutes') || txt.includes('all')) return 'ALL';
+    if (txt.includes('ultra')) return 'UR';
+    if (txt.includes('super')) return 'SR';
+    if (txt.includes('leg') || txt.includes('lég')) return 'L';
+    if (txt.includes('peu') || txt === 'pc' || txt === 'uc') return 'PC';
+    if (txt.includes('rare') || txt === 'r') return 'R';
+    if (txt.includes('com') || txt === 'c') return 'C';
+    return null;
+  }
 
-    const cleanStr = (s) =>
-      (s || '')
-        .trim()
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, ' ');
+  /**
+   * Détecte la rareté cible de la carte inspectée (code et nom complet).
+   * Priorité : badge sous le h2 dans la modale > fallback booster.
+   */
+  function getCardTargetRarity(cardData) {
+    const cardFrame = document.querySelector('.card-frame') || document;
+    const h2 = cardFrame.querySelector('h2');
+    if (h2 && h2.parentElement) {
+      const spans = Array.from(h2.parentElement.querySelectorAll('span'));
+      for (const span of spans) {
+        const txt = (span.textContent || span.innerText || '').trim();
+        const code = normalizeRarity(txt);
+        if (code && !txt.toLowerCase().includes('détail') && !txt.toLowerCase().includes('march') && txt.length < 25) {
+          return { code, name: txt };
+        }
+      }
+    }
 
-    const RARITY_ALIASES = {
-      'l': ['l', 'legendaire', 'legendary'],
-      'ur': ['ur', 'ultra rare', 'ultra-rare'],
-      'sr': ['sr', 'super rare', 'super-rare'],
-      'r': ['r', 'rare'],
-      'pc': ['pc', 'peu commune', 'peu commun'],
-      'c': ['c', 'commune', 'commun']
+    const fallbackCode = normalizeRarity(cardData && cardData.rarity);
+    const meta = RARITY_META_MAP[fallbackCode];
+    return {
+      code: fallbackCode,
+      name: meta ? meta.label : (cardData && cardData.rarity || 'Commune')
     };
+  }
 
-    // 1. Détection de la rareté cible dans la modale
-    let targetRarity = null;
+  /**
+   * Recherche le groupe de boutons de filtre de rareté dans l'onglet Marché.
+   * Cible : <div class="flex flex-wrap gap-1.5"><button ...>Toutes</button><button ...>Rare</button>...</div>
+   */
+  function findMarketRarityButtons(modal) {
+    const searchRoots = [
+      document.querySelector('.card-frame'),
+      modal,
+      document.querySelector('div[role="dialog"]'),
+      document
+    ].filter(Boolean);
 
-    // Badge exact dans la modale :
-    // <span class="inline-block px-2 py-0.5 rounded text-xs font-bold" style="background-color: var(--color-rarity-l)...">Légendaire</span>
-    const rarityBadge = modal.querySelector(
-      'span[style*="--color-rarity-"], span.inline-block.rounded.text-xs.font-bold, span[class*="text-xs"][class*="font-bold"]'
-    );
+    for (const root of searchRoots) {
+      // 1. Conteneur .flex.flex-wrap contenant un bouton "Toutes"
+      const flexWraps = root.querySelectorAll('div.flex.flex-wrap, div[class*="flex-wrap"]');
+      for (const fw of flexWraps) {
+        const btns = Array.from(fw.querySelectorAll('button'));
+        if (btns.some(b => (b.textContent || '').trim().toLowerCase().includes('toutes')) && btns.length > 1) {
+          return btns;
+        }
+      }
 
-    if (rarityBadge) {
-      targetRarity = rarityBadge.innerText.trim();
-    } else {
-      const coloredElement = modal.querySelector('[style*="--color-rarity-"]');
-      if (coloredElement) {
-        const style = coloredElement.getAttribute('style') || '';
-        if (style.includes('--color-rarity-l')) targetRarity = 'Légendaire';
-        else if (style.includes('--color-rarity-ur')) targetRarity = 'Ultra Rare';
-        else if (style.includes('--color-rarity-sr')) targetRarity = 'Super Rare';
-        else if (style.includes('--color-rarity-r')) targetRarity = 'Rare';
-        else if (style.includes('--color-rarity-pc')) targetRarity = 'Peu commune';
-        else if (style.includes('--color-rarity-c')) targetRarity = 'Commune';
+      // 2. Boutons avec aria-pressed dans la modale
+      const pressedBtns = Array.from(root.querySelectorAll('button[aria-pressed]'));
+      const toutesBtn = pressedBtns.find(b => (b.textContent || '').trim().toLowerCase().includes('toutes'));
+      if (toutesBtn && toutesBtn.parentElement) {
+        const siblingBtns = Array.from(toutesBtn.parentElement.querySelectorAll('button'));
+        if (siblingBtns.length > 1) return siblingBtns;
       }
     }
 
-    if (!targetRarity && fallbackRarity) {
-      targetRarity = fallbackRarity;
+    return [];
+  }
+
+  /**
+   * Trouve le bouton correspondant à la rareté cible parmi les boutons de filtre.
+   */
+  function findTargetRarityButton(buttons, targetRarity) {
+    const targetCode = targetRarity.code;
+    const cleanTargetName = targetRarity.name.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    for (const btn of buttons) {
+      const rawText = (btn.textContent || btn.innerText || '').trim();
+      const cleanBtn = rawText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      if (cleanBtn.includes('toutes') || cleanBtn.includes('all')) continue;
+
+      // 1. Correspondance exacte de libellé (ex: "rare" === "rare", "super rare" === "super rare")
+      if (cleanBtn === cleanTargetName) return btn;
+
+      // 2. Correspondance par code de rareté ('R', 'SR', 'UR', 'L', 'PC', 'C')
+      const btnCode = normalizeRarity(cleanBtn);
+      if (btnCode === targetCode) return btn;
     }
-
-    if (!targetRarity) {
-      return { success: false, rarity: null, updated: false };
-    }
-
-    const normalizedTarget = cleanStr(targetRarity);
-
-    // Résolution des alias pour matcher les formes courtes et complètes
-    let targetAliases = [normalizedTarget];
-    for (const aliases of Object.values(RARITY_ALIASES)) {
-      if (aliases.includes(normalizedTarget)) {
-        targetAliases = aliases;
-        break;
-      }
-    }
-
-    // 2. Recherche des boutons de filtre dans le conteneur .flex.flex-wrap.gap-1.5
-    // Structure: <button type="button" class="px-2 py-0.5 rounded-full text-[10px] font-semibold border..." aria-pressed="...">
-    const filterButtons = Array.from(
-      modal.querySelectorAll(
-        '.flex-wrap button.rounded-full, button.px-2.py-0\\.5.rounded-full.text-\\[10px\\], button[class*="rounded-full"][class*="text-[10px]"], button[class*="px-2"][class*="py-0.5"]'
-      )
-    );
-
-    if (filterButtons.length === 0) {
-      return { success: false, rarity: targetRarity, updated: false };
-    }
-
-    const targetButton = filterButtons.find(btn => {
-      let btnText = (btn.innerText || btn.textContent || '').trim();
-      btnText = btnText.replace(/\s*\(\d+\)/g, ''); // Supprime les compteurs éventuels
-      const normBtnText = cleanStr(btnText);
-      return targetAliases.includes(normBtnText);
-    });
-
-    if (!targetButton) {
-      return { success: false, rarity: targetRarity, updated: false };
-    }
-
-    // Vérifier si le filtre est déjà actif (aria-pressed="true")
-    if (targetButton.getAttribute('aria-pressed') === 'true') {
-      return { success: true, rarity: targetRarity, updated: false };
-    }
-
-    // Clic sécurisé avec PointerEvent + MouseEvent + click natif (compatible React 18)
-    forceClickElement(targetButton);
-    console.log(`🎯 [WikiLogix Filter] Filtre rareté activé : "${targetRarity}"`);
-
-    // 3. Attente asynchrone du rafraîchissement React
-    await new Promise(resolve => setTimeout(resolve, refreshWaitMs));
-
-    return { success: true, rarity: targetRarity, updated: true };
+    return null;
   }
 
   function inspectCardPricesStealth(cardElement, cardData, callback) {
@@ -820,13 +810,8 @@
         applyStealthInline(portal);
       }
 
-      // ── Market tab click with retry (React may not render tabs instantly) ──
-      let tabClickAttempts = 0;
-      const MAX_TAB_CLICKS = 4;
-      const TAB_CLICK_GAP  = 100; // ms
-
+      // ── Clic onglet Marché avec helper résilient ──────────────────────────
       function tryClickMarketTab() {
-        tabClickAttempts++;
         const tabs = Array.from(modal.querySelectorAll(
           'button[role="tab"], [role="tablist"] button, nav button, button, div[role="button"]'
         ));
@@ -836,31 +821,23 @@
                  txt.includes('market') || txt.includes('history') || txt.includes('sales');
         });
         if (marketTab) {
+          if (marketTab.getAttribute('aria-selected') === 'true') return true;
           forceClickElement(marketTab);
-          return true; // clicked
+          return true;
         }
         return false;
       }
 
-      // First attempt immediately, then retry with delays
-      if (!tryClickMarketTab() && tabClickAttempts < MAX_TAB_CLICKS) {
-        const tabRetryTimer = setInterval(() => {
-          if (tryClickMarketTab() || tabClickAttempts >= MAX_TAB_CLICKS || isFinished) {
-            clearInterval(tabRetryTimer);
-          }
-        }, TAB_CLICK_GAP);
-      }
+      // Tentative immédiate de clic sur l'onglet Marché
+      tryClickMarketTab();
 
-      // ── Price extraction loop ──────────────────────────────────────────────
-      // Polls at 70ms intervals. On each tick, tries 5 independent extraction
-      // strategies and accepts the first one that yields a price > 0.
-      // If no price found after 5 ticks, re-clicks the market tab (handles
-      // cases where the first click arrived before the tab was ready).
-      // Max budget: 18 ticks × 70ms = ~1.26s before giving up.
-      const MAX_POLL_ATTEMPTS = 10;
-      const RETAB_AT_TICK     = 3;  // re-click market tab if still no price at tick 3
-
+      // ── Extraction et boucle de polling séquentielle ───────────────────────
+      const targetRarity = getCardTargetRarity(cardData);
+      let rarityFilterConfirmed = false;
+      let filterClickedTime = 0;
       let waitDataAttempts = 0;
+      const MAX_POLL_ATTEMPTS = 20;
+      const RETAB_AT_TICK = 3;
 
       /**
        * Core extraction function — runs all 5 strategies against `container`
@@ -883,7 +860,6 @@
         const listingPrices = [];
         const allNodes = container.querySelectorAll('span, div, td, p, li, b, strong');
         for (const el of allNodes) {
-          // Accept leaves AND nodes whose only children are SVG icons
           const nonSvgChildren = Array.from(el.children).filter(c => c.tagName !== 'SVG' && c.tagName !== 'svg');
           if (nonSvgChildren.length > 0) continue;
           const rawText = (el.innerText || el.textContent || '').trim();
@@ -903,8 +879,6 @@
         const statMax  = extractStatBlockValue(container, STAT_LABEL_MAX);
 
         // ── Strategy 4: Parent-walk from any 🪙 element ───────────────────
-        // Some React components wrap the price in a sibling container; walk
-        // up 3 levels from each coin element to find a numeric sibling.
         let walkAvg = 0, walkMin = 0, walkMax = 0;
         const coinNodes = container.querySelectorAll('*');
         for (const el of coinNodes) {
@@ -927,8 +901,6 @@
         }
 
         // ── Strategy 5: Positional scan — find all rounded "stat cards"
-        // wiki-masters renders price blocks as div > p(label) + p(value).
-        // Scan every small container that has exactly 2 short text children.
         let posAvg = 0, posLast = 0, posMin = 0, posMax = 0;
         const statCards = container.querySelectorAll(
           'div[class*="rounded"], div[class*="border"], div[class*="px-"], div[class*="py-"]'
@@ -948,7 +920,6 @@
           else if (STAT_LABEL_MAX.some(l => labelText.includes(l)) && !posMax) posMax = v;
         }
 
-        // ── Merge: priority = statBlock > positional > parent-walk > regex ──
         return {
           avg:      statAvg  || posAvg  || walkAvg  || regexAvg,
           last:     statLast || posLast || regexLast,
@@ -958,140 +929,154 @@
         };
       }
 
-      // ── Gestion du filtrage automatique par rareté dans le panneau Marché ──
-      // Le filtre est appliqué en PREMIER avec await avant tout scraping de prix,
-      // garantissant que les prix lus correspondent bien à la rareté de la carte.
-      let rarityFilterApplied = false;
+      // ── Boucle de polling unifiée : Onglet Marché -> Filtre Rareté -> Prix ──
+      pollMarketData = setInterval(() => {
+        waitDataAttempts++;
 
-      async function ensureRarityFilterApplied() {
-        if (rarityFilterApplied || isFinished) return;
-        try {
-          const res = await autoFilterMarketRarity(modal, cardData.rarity, 80);
-          rarityFilterApplied = true;
-          if (res.updated) {
-            console.log(`🎯 [WikiLogix Filter] Rareté filtrée : "${res.rarity}" — attente mise à jour React…`);
-            // Attendre un cycle React supplémentaire après le clic pour que les prix soient recalculés
-            await new Promise(resolve => setTimeout(resolve, 100));
+        const modalRoot = document.querySelector('.card-frame') || modal || document;
+
+        // 1. S'assurer que l'onglet Marché est bien sélectionné
+        const tabs = Array.from(modalRoot.querySelectorAll(
+          'button[role="tab"], [role="tablist"] button, nav button, button, div[role="button"]'
+        ));
+        const marketTab = tabs.find(t => {
+          const txt = (t.textContent || t.innerText || '').toLowerCase();
+          return txt.includes('march') || txt.includes('vente') || txt.includes('historique') ||
+                 txt.includes('market') || txt.includes('history') || txt.includes('sales');
+        });
+        if (marketTab) {
+          const isSelected = marketTab.getAttribute('aria-selected') === 'true';
+          if (!isSelected) {
+            forceClickElement(marketTab);
+            try { marketTab.click(); } catch (_) {}
+            if (waitDataAttempts < 4) return;
           }
-        } catch (e) {
-          console.warn('[WikiLogix Filter] Erreur lors du filtrage :', e);
-          rarityFilterApplied = true; // Ne pas bloquer indéfiniment
+        } else if (waitDataAttempts === RETAB_AT_TICK) {
+          tryClickMarketTab();
         }
-      }
 
-      // Lance d'abord le filtrage par rareté de façon atomique, puis démarre la boucle de scraping
-      (async () => {
-        // Attendre que l'onglet Marché soit cliqué et que React ait rendu le panneau
-        // avant de tenter le filtrage (50ms suffisent pour la majorité des cas)
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // 2. Gestion stricte du filtrage par tag de rareté dans l'onglet Marché
+        const rarityButtons = findMarketRarityButtons(modal);
 
-        // Appliquer le filtre de rareté (avec await — bloquant pour cette coroutine)
-        await ensureRarityFilterApplied();
+        if (rarityButtons.length > 1) {
+          const targetBtn = findTargetRarityButton(rarityButtons, targetRarity);
+          if (targetBtn) {
+            const isTargetActive = targetBtn.getAttribute('aria-pressed') === 'true';
+            const allBtn = rarityButtons.find(b => (b.textContent || '').trim().toLowerCase().includes('toutes'));
+            const isAllActive = allBtn && allBtn.getAttribute('aria-pressed') === 'true';
 
-        if (isFinished) return;
+            // Si le tag de notre rareté n'est pas encore actif OU si "Toutes" est encore actif :
+            if (!isTargetActive || isAllActive) {
+              console.log(`🎯 [WikiLogix Filter] Clic sur le tag rareté "${targetRarity.name}" (${targetRarity.code})...`);
+              forceClickElement(targetBtn);
+              try { targetBtn.click(); } catch (_) {}
+              filterClickedTime = Date.now();
+              return; // INTERDICTION FORMELLE DE SCRAPER LES STATS DE "TOUTES" !
+            }
 
-        // ── Price extraction loop ────────────────────────────────────────────
-        // Maintenant que la rareté correcte est sélectionnée, on peut scraper
-        // les prix en toute sécurité.
-        pollMarketData = setInterval(() => {
-          waitDataAttempts++;
+            // Si le tag vient d'être activé, attendre au moins 140ms pour que React recalcule les prix
+            if (filterClickedTime > 0 && (Date.now() - filterClickedTime < 140)) {
+              return; // Laisser React finir de mettre à jour le DOM
+            }
+            rarityFilterConfirmed = true;
+          }
+        } else {
+          // Aucun groupe de tags multiples détecté :
+          // Si le marché n'a pas encore chargé ses données, attendre
+          const marketText = (modalRoot.innerText || modalRoot.textContent || '').toLowerCase();
+          const hasMarketData = marketText.includes('évolution') || marketText.includes('ventes') || marketText.includes('moyenne');
+          if (!hasMarketData && waitDataAttempts < 5) {
+            return;
+          }
+          if (!rarityFilterConfirmed && waitDataAttempts < 4) {
+            return; // Attendre que les tags apparaissent éventuellement
+          }
+        }
 
-          // Re-click the market tab at tick RETAB_AT_TICK if we still have no prices
-          // (handles race where first click happened before tab was rendered)
-          if (waitDataAttempts === RETAB_AT_TICK) {
-            tryClickMarketTab();
+        // 3. Extraction des données de marché pour cette rareté
+        try {
+          // Court-circuit : aucune vente détectée pour cette rareté
+          const hasNoSales = Array.from(modalRoot.querySelectorAll('p, span, div')).some(el => {
+            if (el.children.length > 0) return false;
+            const t = (el.innerText || el.textContent || '').trim().toLowerCase();
+            return t.includes('aucune vente');
+          });
+          if (hasNoSales) {
+            if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
+            console.log(`⚪ [WikiLogix Prix] "${cardData.name}" [${targetRarity.code}] → Aucune vente, prix = 0`);
+            finishInspection();
+            return;
           }
 
-          try {
-            // ── Court-circuit : aucune vente détectée ─────────────────────
-            // Si le DOM contient "Aucune vente pour l'instant." on renvoie 0
-            // immédiatement sans attendre les ticks restants.
-            const hasNoSales = Array.from(modal.querySelectorAll('p, span, div')).some(el => {
-              if (el.children.length > 0) return false; // feuilles seulement
-              const t = (el.innerText || el.textContent || '').trim().toLowerCase();
-              return t.includes('aucune vente');
-            });
-            if (hasNoSales) {
-              if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
-              console.log(`⚪ [WikiLogix Prix] "${cardData.name}" → Aucune vente, prix = 0`);
-              finishInspection();
-              return;
+          const marketContainer =
+            modalRoot.querySelector('[role="tabpanel"]:not([hidden]):not([aria-hidden="true"])') ||
+            modalRoot.querySelector('[role="tabpanel"], div[class*="tab-content"], div[class*="market"], div[class*="history"], div[class*="ventes"]') ||
+            modalRoot;
+
+          const rawText = (marketContainer.innerText || marketContainer.textContent || '').trim();
+          const looksLoading = rawText.length < 10 ||
+                               marketContainer.querySelector('[class*="spin"], [class*="loading"], [class*="skeleton"]');
+          if (looksLoading && waitDataAttempts < MAX_POLL_ATTEMPTS - 2) {
+            return;
+          }
+
+          const { avg, last, min, max, listings } = extractPricesFromContainer(marketContainer);
+          const hasFoundPrice = avg > 0 || last > 0 || min > 0 || max > 0 || listings.length > 0;
+
+          if (hasFoundPrice || waitDataAttempts >= MAX_POLL_ATTEMPTS) {
+            if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
+
+            // Commit results to cardData
+            if (last > 0) cardData.lastPrice = String(last);
+            if (min  > 0) cardData.minPrice  = String(min);
+            if (avg  > 0) cardData.avgPrice  = String(avg);
+            if (max  > 0) cardData.maxPrice  = String(max);
+
+            if (listings.length > 0) {
+              const sorted = [...listings].sort((a, b) => a - b);
+              const listMin = sorted[0];
+              const listMax = sorted[sorted.length - 1];
+              const listAvg = Math.round(sorted.reduce((a, b) => a + b, 0) / sorted.length);
+              const listLast = listings[0];
+
+              if (!cardData.minPrice  || cardData.minPrice  === '0') cardData.minPrice  = String(listMin);
+              if (!cardData.maxPrice  || cardData.maxPrice  === '0') cardData.maxPrice  = String(listMax);
+              if (!cardData.avgPrice  || cardData.avgPrice  === '0') cardData.avgPrice  = String(listAvg);
+              if (!cardData.lastPrice || cardData.lastPrice === '0') cardData.lastPrice = String(listLast);
             }
-            // Prefer the active tabpanel; fall back to the whole modal
-            const marketContainer =
-              modal.querySelector('[role="tabpanel"]:not([hidden]):not([aria-hidden="true"])') ||
-              modal.querySelector('[role="tabpanel"], div[class*="tab-content"], div[class*="market"], div[class*="history"], div[class*="ventes"]') ||
-              modal;
 
-            // ── Content-ready guard ────────────────────────────────────────
-            // If the market tab panel appears completely empty or shows only a
-            // loader, wait one more tick before parsing — the data isn't there yet.
-            const rawText = (marketContainer.innerText || marketContainer.textContent || '').trim();
-            const looksLoading = rawText.length < 10 ||
-                                 marketContainer.querySelector('[class*="spin"], [class*="loading"], [class*="skeleton"]');
-            if (looksLoading && waitDataAttempts < MAX_POLL_ATTEMPTS - 2) {
-              return; // wait for next tick
+            // Calcul du prix suggéré
+            const parsedMin  = parseFloat(cardData.minPrice)  || 0;
+            const parsedAvg  = parseFloat(cardData.avgPrice)  || 0;
+            const parsedLast = parseFloat(cardData.lastPrice) || 0;
+
+            if (parsedMin > 0 && parsedAvg > 0) {
+              cardData.suggestedPrice = parsedAvg > parsedMin * 2.5
+                ? Math.round(parsedMin * 1.15) || (parsedMin + 1)
+                : Math.round((parsedMin + parsedAvg) / 2);
+            } else {
+              cardData.suggestedPrice = Math.round(parsedMin || parsedAvg || parsedLast || 0);
             }
 
-            const { avg, last, min, max, listings } = extractPricesFromContainer(marketContainer);
-            const hasFoundPrice = avg > 0 || last > 0 || min > 0 || max > 0 || listings.length > 0;
-
-            if (hasFoundPrice || waitDataAttempts >= MAX_POLL_ATTEMPTS) {
-              if (pollMarketData) { clearInterval(pollMarketData); pollMarketData = null; }
-
-              // Commit results to cardData
-              if (last > 0) cardData.lastPrice = String(last);
-              if (min  > 0) cardData.minPrice  = String(min);
-              if (avg  > 0) cardData.avgPrice  = String(avg);
-              if (max  > 0) cardData.maxPrice  = String(max);
-
-              // Supplement from listing prices if any stat is still missing
-              if (listings.length > 0) {
-                const sorted = [...listings].sort((a, b) => a - b);
-                const listMin = sorted[0];
-                const listMax = sorted[sorted.length - 1];
-                const listAvg = Math.round(sorted.reduce((a, b) => a + b, 0) / sorted.length);
-                const listLast = listings[0]; // most recent = first encountered
-
-                if (!cardData.minPrice  || cardData.minPrice  === '0') cardData.minPrice  = String(listMin);
-                if (!cardData.maxPrice  || cardData.maxPrice  === '0') cardData.maxPrice  = String(listMax);
-                if (!cardData.avgPrice  || cardData.avgPrice  === '0') cardData.avgPrice  = String(listAvg);
-                if (!cardData.lastPrice || cardData.lastPrice === '0') cardData.lastPrice = String(listLast);
-              }
-
-              // Compute suggested resale price
-              const parsedMin  = parseFloat(cardData.minPrice)  || 0;
-              const parsedAvg  = parseFloat(cardData.avgPrice)  || 0;
-              const parsedLast = parseFloat(cardData.lastPrice) || 0;
-
-              if (parsedMin > 0 && parsedAvg > 0) {
-                cardData.suggestedPrice = parsedAvg > parsedMin * 2.5
-                  ? Math.round(parsedMin * 1.15) || (parsedMin + 1)
-                  : Math.round((parsedMin + parsedAvg) / 2);
-              } else {
-                cardData.suggestedPrice = Math.round(parsedMin || parsedAvg || parsedLast || 0);
-              }
-
-              const strategyUsed = avg > 0 ? 'stat/regex' : listings.length > 0 ? 'listing' : 'timeout';
-              console.log(
-                `💰 [WikiLogix Prix] "${cardData.name}" → Avg:${cardData.avgPrice} Min:${cardData.minPrice} Max:${cardData.maxPrice} Last:${cardData.lastPrice}`,
-                `(${listings.length} prix listing | tick ${waitDataAttempts}/${MAX_POLL_ATTEMPTS} | strategy: ${strategyUsed})`
-              );
-              finishInspection();
-            }
-          } catch (e) {
-            console.warn('[WikiLogix] Notice: Parsing marché error', e);
+            const strategyUsed = avg > 0 ? 'stat/regex' : listings.length > 0 ? 'listing' : 'timeout';
+            console.log(
+              `💰 [WikiLogix Prix] "${cardData.name}" [${targetRarity.code}] → Avg:${cardData.avgPrice} Min:${cardData.minPrice} Max:${cardData.maxPrice} Last:${cardData.lastPrice}`,
+              `(${listings.length} prix listing | tick ${waitDataAttempts}/${MAX_POLL_ATTEMPTS} | strategy: ${strategyUsed})`
+            );
             finishInspection();
           }
-        }, 70);
-      })(); // fin de l'IIFE async — lance le filtrage puis le scraping
+        } catch (e) {
+          console.warn('[WikiLogix] Notice: Parsing marché error', e);
+          finishInspection();
+        }
+      }, 70);
     };
 
-    // Watchdog strict d'inspection (1s max — filtre ~230ms + scraping ~700ms)
+    // Watchdog strict d'inspection (1.8s max — onglet + tag rareté + scraping)
     inspectionWatchdog = setTimeout(() => {
-      console.warn("⚠️ [Watchdog Inspection] Timeout 1s atteint, reprise immédiate.");
+      console.warn("⚠️ [Watchdog Inspection] Timeout 1.8s atteint, reprise immédiate.");
       finishInspection();
-    }, 1000);
+    }, 1800);
 
     // ── KEY FIX: observe document.body for the modal BEFORE triggering the click.
     // This way we catch the modal node the very instant it's added to the DOM,

@@ -1500,6 +1500,558 @@
   }
 
   // ==========================================================================
+  // 3.4. GRAPHIQUE TEMPOREL : RENDEMENT DES BOOSTERS (TIMERS GRATUITS)
+  // ==========================================================================
+
+  class BoosterYieldTemporalChart {
+    constructor(canvasId, tooltipId) {
+      this.canvas = document.getElementById(canvasId);
+      this.tooltip = document.getElementById(tooltipId);
+      this.cards = [];
+      this.currentView = 'hourly'; // 'hourly' | 'daily'
+      this.aggregatedData = [];
+      this.hoverIndex = -1;
+      this.animationProgress = 1;
+      this.animationFrame = null;
+
+      if (this.canvas) {
+        this.initEvents();
+        if (typeof ResizeObserver !== 'undefined' && this.canvas.parentElement) {
+          this.resizeObserver = new ResizeObserver(() => this.render(1));
+          this.resizeObserver.observe(this.canvas.parentElement);
+        } else {
+          window.addEventListener('resize', () => this.render(1));
+        }
+      }
+    }
+
+    setView(viewMode) {
+      if (this.currentView === viewMode) return;
+      this.currentView = viewMode;
+      this.hoverIndex = -1;
+      if (this.tooltip) this.tooltip.style.opacity = '0';
+      this.processData();
+      this.animate();
+    }
+
+    setData(cards) {
+      this.cards = Array.isArray(cards) ? cards : [];
+      this.processData();
+      this.animate();
+    }
+
+    processData() {
+      if (!this.cards || this.cards.length === 0) {
+        this.aggregatedData = [];
+        this.updateIndicators(0, 0, 0);
+        return;
+      }
+
+      // Normalisation des timestamps et des valeurs brutes et nettes
+      const parsedCards = this.cards.map((c) => {
+        let ts = c.timestamp;
+        if (typeof ts === 'string') {
+          ts = new Date(ts).getTime();
+        } else if (!ts || isNaN(ts)) {
+          ts = Date.now();
+        }
+        const gross = Number(c.avgPrice || c.suggestedPrice || 0);
+        let net = 0;
+        if (c.sellPriceMin && c.sellPriceMax) {
+          net = Math.round((Number(c.sellPriceMin) + Number(c.sellPriceMax)) / 2);
+        } else if (c.suggestedPrice && Number(c.suggestedPrice) < gross) {
+          net = Number(c.suggestedPrice);
+        } else {
+          net = Math.round(gross * 0.625);
+        }
+        return {
+          ...c,
+          ts,
+          grossPrice: gross,
+          netPrice: net
+        };
+      }).sort((a, b) => a.ts - b.ts);
+
+      if (this.currentView === 'hourly') {
+        this.aggregateHourly(parsedCards);
+      } else {
+        this.aggregateDaily(parsedCards);
+      }
+    }
+
+    aggregateHourly(cards) {
+      const now = new Date();
+      const todayY = now.getFullYear();
+      const todayM = now.getMonth();
+      const todayD = now.getDate();
+
+      let targetY = todayY;
+      let targetM = todayM;
+      let targetD = todayD;
+
+      const hasTodayCards = cards.some((c) => {
+        const d = new Date(c.ts);
+        return d.getFullYear() === todayY && d.getMonth() === todayM && d.getDate() === todayD;
+      });
+
+      if (!hasTodayCards && cards.length > 0) {
+        const lastDate = new Date(cards[cards.length - 1].ts);
+        targetY = lastDate.getFullYear();
+        targetM = lastDate.getMonth();
+        targetD = lastDate.getDate();
+      }
+
+      const targetDateObj = new Date(targetY, targetM, targetD);
+      const dateLabel = targetDateObj.toLocaleDateString('fr-FR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+      });
+
+      const slots = Array.from({ length: 24 }, (_, h) => ({
+        hour: h,
+        label: `${String(h).padStart(2, '0')}h`,
+        periodName: `${String(h).padStart(2, '0')}h00 - ${String(h).padStart(2, '0')}h59`,
+        grossDelta: 0,
+        netDelta: 0,
+        cardCount: 0,
+        boostersCount: 0,
+        cards: [],
+        dateText: dateLabel
+      }));
+
+      cards.forEach((card) => {
+        const d = new Date(card.ts);
+        if (d.getFullYear() === targetY && d.getMonth() === targetM && d.getDate() === targetD) {
+          const h = d.getHours();
+          slots[h].grossDelta += card.grossPrice;
+          slots[h].netDelta += card.netPrice;
+          slots[h].cardCount++;
+          slots[h].cards.push(card);
+        }
+      });
+
+      let cumGross = 0;
+      let cumNet = 0;
+      this.aggregatedData = slots.map((slot, idx) => {
+        cumGross += slot.grossDelta;
+        cumNet += slot.netDelta;
+        slot.boostersCount = slot.cardCount > 0 ? Math.max(1, Math.ceil(slot.cardCount / 5)) : 0;
+        return {
+          ...slot,
+          index: idx,
+          cumulativeGross: cumGross,
+          cumulativeNet: cumNet
+        };
+      });
+
+      const maxDrop = Math.max(...this.aggregatedData.map((d) => d.grossDelta), 0);
+      this.updateIndicators(cumGross, cumNet, maxDrop, `Session : ${dateLabel}`);
+    }
+
+    aggregateDaily(cards) {
+      const dayMap = new Map();
+
+      cards.forEach((card) => {
+        const d = new Date(card.ts);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (!dayMap.has(key)) {
+          dayMap.set(key, {
+            key,
+            dObj: d,
+            label: d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+            periodName: d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+            grossDelta: 0,
+            netDelta: 0,
+            cardCount: 0,
+            cards: []
+          });
+        }
+        const item = dayMap.get(key);
+        item.grossDelta += card.grossPrice;
+        item.netDelta += card.netPrice;
+        item.cardCount++;
+        item.cards.push(card);
+      });
+
+      const sortedDays = Array.from(dayMap.values()).sort((a, b) => a.dObj - b.dObj);
+
+      let cumGross = 0;
+      let cumNet = 0;
+      this.aggregatedData = sortedDays.map((day, idx) => {
+        cumGross += day.grossDelta;
+        cumNet += day.netDelta;
+        day.boostersCount = day.cardCount > 0 ? Math.max(1, Math.ceil(day.cardCount / 5)) : 0;
+        return {
+          ...day,
+          index: idx,
+          cumulativeGross: cumGross,
+          cumulativeNet: cumNet
+        };
+      });
+
+      const maxDrop = Math.max(...this.aggregatedData.map((d) => d.grossDelta), 0);
+      this.updateIndicators(cumGross, cumNet, maxDrop, `${this.aggregatedData.length} jour${this.aggregatedData.length > 1 ? 's' : ''} enregistrés`);
+    }
+
+    updateIndicators(totalGross, totalNet, maxDrop, sessionInfo = '') {
+      const elGross = document.getElementById('yield-stat-gross');
+      const elNet = document.getElementById('yield-stat-net');
+      const elDrop = document.getElementById('yield-stat-drop');
+      const elViewLabel = document.getElementById('yield-current-view-label');
+
+      if (elGross) elGross.textContent = `${totalGross.toLocaleString('fr-FR')} 🪙`;
+      if (elNet) elNet.textContent = `${totalNet.toLocaleString('fr-FR')} 🪙`;
+      if (elDrop) {
+        elDrop.textContent = maxDrop > 0 ? `Max : +${maxDrop.toLocaleString('fr-FR')} 🪙` : 'Aucun pic';
+      }
+      if (elViewLabel) {
+        if (sessionInfo) {
+          elViewLabel.textContent = `${this.currentView === 'hourly' ? 'Vue 24h' : 'Vue Globale'} • ${sessionInfo}`;
+        } else {
+          elViewLabel.textContent = this.currentView === 'hourly' ? 'Vue 24h Intra-journalière' : 'Historique Quotidien';
+        }
+      }
+    }
+
+    animate() {
+      let start = null;
+      const duration = 600;
+
+      const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        this.animationProgress = Math.min(1, elapsed / duration);
+        const ease = 1 - Math.pow(1 - this.animationProgress, 3);
+        this.render(ease);
+
+        if (this.animationProgress < 1) {
+          this.animationFrame = requestAnimationFrame(step);
+        }
+      };
+
+      if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = requestAnimationFrame(step);
+    }
+
+    initEvents() {
+      this.canvas.addEventListener('mousemove', (e) => {
+        if (this.aggregatedData.length === 0) return;
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        this.handleMouseMove(x, y, rect);
+      });
+
+      this.canvas.addEventListener('mouseleave', () => {
+        this.hoverIndex = -1;
+        if (this.tooltip) this.tooltip.style.opacity = '0';
+        this.render(1);
+      });
+    }
+
+    handleMouseMove(mouseX, mouseY, rect) {
+      const padding = { top: 30, right: 35, bottom: 42, left: 70 };
+      const chartWidth = rect.width - padding.left - padding.right;
+
+      if (mouseX < padding.left || mouseX > rect.width - padding.right) {
+        this.hoverIndex = -1;
+        if (this.tooltip) this.tooltip.style.opacity = '0';
+        this.render(1);
+        return;
+      }
+
+      const n = this.aggregatedData.length;
+      const stepX = chartWidth / Math.max(1, n - 1);
+      const closestIndex = Math.min(
+        n - 1,
+        Math.max(0, Math.round((mouseX - padding.left) / stepX))
+      );
+
+      this.hoverIndex = closestIndex;
+      this.render(1);
+      this.updateTooltip(rect, padding, stepX);
+    }
+
+    updateTooltip(rect, padding, stepX) {
+      if (!this.tooltip || this.hoverIndex === -1) return;
+      const item = this.aggregatedData[this.hoverIndex];
+      if (!item) return;
+
+      const posX = padding.left + this.hoverIndex * stepX;
+      const hasActivity = item.cardCount > 0;
+
+      this.tooltip.innerHTML = `
+        <div class="chart-tooltip-header" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; margin-bottom: 8px;">
+          <span class="tooltip-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.4);">
+            ⏱️ ${item.label}
+          </span>
+          <span class="tooltip-title" style="font-size: 11px; color: #94a3b8;">${item.periodName}</span>
+        </div>
+        <div class="chart-tooltip-body" style="gap: 5px;">
+          <div class="tooltip-row" style="color: #94a3b8;">
+            <span>Activité Booster :</span>
+            <strong style="color: ${hasActivity ? '#38bdf8' : '#64748b'};">
+              ${hasActivity ? `~${item.boostersCount} booster(s) • ${item.cardCount} cartes` : 'Aucun tirage'}
+            </strong>
+          </div>
+          ${hasActivity ? `
+          <div class="tooltip-row" style="color: #cbd5e1;">
+            <span>Drop instantané :</span>
+            <strong style="color: #ffe144;">+${item.grossDelta.toLocaleString('fr-FR')} 🪙</strong>
+          </div>
+          ` : ''}
+          <div class="tooltip-row highlight" style="background: rgba(255, 225, 68, 0.08); padding: 4px 6px; border-radius: 4px; border-left: 2px solid #ffe144;">
+            <span style="color: #ffe144;">Cumul Brut Total :</span>
+            <strong style="color: #ffe144;">${item.cumulativeGross.toLocaleString('fr-FR')} 🪙</strong>
+          </div>
+          <div class="tooltip-row" style="background: rgba(16, 185, 129, 0.08); padding: 4px 6px; border-radius: 4px; border-left: 2px solid #10b981;">
+            <span style="color: #10b981;">Revente Nette (50-75%) :</span>
+            <strong style="color: #10b981;">${item.cumulativeNet.toLocaleString('fr-FR')} 🪙</strong>
+          </div>
+        </div>
+      `;
+
+      this.tooltip.style.opacity = '1';
+
+      const tooltipWidth = this.tooltip.offsetWidth || 210;
+      let leftPos = posX;
+      if (leftPos + tooltipWidth > rect.width - 20) {
+        leftPos = posX - tooltipWidth - 12;
+      } else {
+        leftPos = posX + 14;
+      }
+
+      this.tooltip.style.left = `${leftPos}px`;
+      this.tooltip.style.top = `24px`;
+    }
+
+    render(progress = 1) {
+      if (!this.canvas) return;
+      const { ctx, width, height } = setupRetinaCanvas(this.canvas);
+      ctx.clearRect(0, 0, width, height);
+
+      const padding = { top: 30, right: 35, bottom: 42, left: 70 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+
+      if (this.aggregatedData.length === 0) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '14px "Inter", system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Aucune donnée temporelle disponible', width / 2, height / 2);
+        return;
+      }
+
+      const n = this.aggregatedData.length;
+      const stepX = chartWidth / Math.max(1, n - 1);
+
+      const maxCumGross = Math.max(...this.aggregatedData.map((d) => d.cumulativeGross), 10);
+      const maxY = Math.ceil(maxCumGross * 1.12);
+      const maxDropDelta = Math.max(...this.aggregatedData.map((d) => d.grossDelta), 1);
+
+      // 1. Grille horizontale & graduations Y
+      const gridLines = 5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#64748b';
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'right';
+
+      for (let i = 0; i <= gridLines; i++) {
+        const val = (maxY / gridLines) * i;
+        const y = padding.top + chartHeight - (chartHeight * (i / gridLines));
+
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+
+        ctx.fillText(`${Math.round(val).toLocaleString('fr-FR')} 🪙`, padding.left - 10, y + 4);
+      }
+
+      // 2. Barres de drop instantané par intervalle (en arrière-plan)
+      const barWidth = Math.max(4, Math.min(18, stepX * 0.42));
+      this.aggregatedData.forEach((item, i) => {
+        if (item.grossDelta <= 0) return;
+        const x = padding.left + i * stepX;
+        const barH = (item.grossDelta / maxDropDelta) * (chartHeight * 0.45) * progress;
+        const y = padding.top + chartHeight - barH;
+
+        const isHovered = this.hoverIndex === i;
+
+        ctx.save();
+        const grad = ctx.createLinearGradient(0, y, 0, padding.top + chartHeight);
+        grad.addColorStop(0, isHovered ? 'rgba(6, 182, 212, 0.9)' : 'rgba(6, 182, 212, 0.55)');
+        grad.addColorStop(1, 'rgba(6, 182, 212, 0.05)');
+
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x - barWidth / 2, y, barWidth, barH, [4, 4, 0, 0]);
+        } else {
+          ctx.rect(x - barWidth / 2, y, barWidth, barH);
+        }
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        if (isHovered) {
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
+
+      // Coordonnées des points pour les courbes cumulées
+      const grossPoints = this.aggregatedData.map((d, i) => {
+        const x = padding.left + i * stepX;
+        const ratio = (d.cumulativeGross / maxY) * progress;
+        const y = padding.top + chartHeight - (chartHeight * ratio);
+        return { x, y, raw: d };
+      });
+
+      const netPoints = this.aggregatedData.map((d, i) => {
+        const x = padding.left + i * stepX;
+        const ratio = (d.cumulativeNet / maxY) * progress;
+        const y = padding.top + chartHeight - (chartHeight * ratio);
+        return { x, y, raw: d };
+      });
+
+      // 3. Dégradé sous la courbe principale Valeur Brute (Or Fluo)
+      if (grossPoints.length >= 2) {
+        const areaGrad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+        areaGrad.addColorStop(0, 'rgba(255, 225, 68, 0.22)');
+        areaGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.08)');
+        areaGrad.addColorStop(1, 'rgba(255, 225, 68, 0.0)');
+
+        ctx.beginPath();
+        ctx.moveTo(grossPoints[0].x, padding.top + chartHeight);
+        ctx.lineTo(grossPoints[0].x, grossPoints[0].y);
+
+        for (let i = 0; i < grossPoints.length - 1; i++) {
+          const curr = grossPoints[i];
+          const next = grossPoints[i + 1];
+          const xc = (curr.x + next.x) / 2;
+          const yc = (curr.y + next.y) / 2;
+          ctx.quadraticCurveTo(curr.x, curr.y, xc, yc);
+        }
+        const lastG = grossPoints[grossPoints.length - 1];
+        ctx.lineTo(lastG.x, lastG.y);
+        ctx.lineTo(lastG.x, padding.top + chartHeight);
+        ctx.closePath();
+        ctx.fillStyle = areaGrad;
+        ctx.fill();
+      }
+
+      // 4. Courbe secondaire : Rendement Net Estimé à la Revente (Vert Émeraude)
+      if (netPoints.length >= 2) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(netPoints[0].x, netPoints[0].y);
+        for (let i = 0; i < netPoints.length - 1; i++) {
+          const curr = netPoints[i];
+          const next = netPoints[i + 1];
+          const xc = (curr.x + next.x) / 2;
+          const yc = (curr.y + next.y) / 2;
+          ctx.quadraticCurveTo(curr.x, curr.y, xc, yc);
+        }
+        const lastN = netPoints[netPoints.length - 1];
+        ctx.lineTo(lastN.x, lastN.y);
+
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.2;
+        ctx.shadowColor = 'rgba(16, 185, 129, 0.65)';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 5. Courbe principale : Valeur Brute Cumulée (Or Néon)
+      if (grossPoints.length >= 2) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(grossPoints[0].x, grossPoints[0].y);
+        for (let i = 0; i < grossPoints.length - 1; i++) {
+          const curr = grossPoints[i];
+          const next = grossPoints[i + 1];
+          const xc = (curr.x + next.x) / 2;
+          const yc = (curr.y + next.y) / 2;
+          ctx.quadraticCurveTo(curr.x, curr.y, xc, yc);
+        }
+        const lastG = grossPoints[grossPoints.length - 1];
+        ctx.lineTo(lastG.x, lastG.y);
+
+        ctx.strokeStyle = '#ffe144';
+        ctx.lineWidth = 2.8;
+        ctx.shadowColor = 'rgba(255, 225, 68, 0.85)';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 6. Réticule vertical & points illuminés au survol
+      if (this.hoverIndex >= 0 && this.hoverIndex < this.aggregatedData.length) {
+        const gp = grossPoints[this.hoverIndex];
+        const np = netPoints[this.hoverIndex];
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(gp.x, padding.top);
+        ctx.lineTo(gp.x, padding.top + chartHeight);
+        ctx.stroke();
+        ctx.restore();
+
+        // Point Net (Émeraude)
+        ctx.beginPath();
+        ctx.arc(np.x, np.y, 7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.35)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(np.x, np.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.5;
+        ctx.fill();
+        ctx.stroke();
+
+        // Point Brut (Or)
+        ctx.beginPath();
+        ctx.arc(gp.x, gp.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 225, 68, 0.4)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(gp.x, gp.y, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#07090e';
+        ctx.strokeStyle = '#ffe144';
+        ctx.lineWidth = 3;
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // 7. Axe horizontal X (Labels temporels)
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px "Inter", system-ui, sans-serif';
+      ctx.textAlign = 'center';
+
+      const maxLabels = Math.min(12, n);
+      const labelStep = Math.max(1, Math.ceil(n / maxLabels));
+
+      for (let i = 0; i < n; i++) {
+        if (i === 0 || i === n - 1 || i % labelStep === 0) {
+          const x = padding.left + i * stepX;
+          const isHovered = this.hoverIndex === i;
+          ctx.fillStyle = isHovered ? '#38bdf8' : '#64748b';
+          ctx.font = isHovered ? 'bold 10px "Inter", sans-serif' : '10px "Inter", sans-serif';
+          ctx.fillText(this.aggregatedData[i].label, x, height - 16);
+        }
+      }
+    }
+  }
+
+  // ==========================================================================
   // 4. ÉTAT GLOBAL DU DASHBOARD
   // ==========================================================================
 
@@ -1526,7 +2078,8 @@
     charts: {
       gains: null,
       donut: null,
-      priceTiers: null
+      priceTiers: null,
+      boosterYield: null
     }
   };
 
@@ -1669,6 +2222,9 @@
     if (state.charts.priceTiers) {
       state.charts.priceTiers.setData(state.cards);
     }
+    if (state.charts.boosterYield) {
+      state.charts.boosterYield.setData(state.cards);
+    }
 
     // Métriques avancées Onglet 2
     const sortedByPrice = [...state.cards].sort((a, b) => Number(b.avgPrice || 0) - Number(a.avgPrice || 0));
@@ -1755,6 +2311,7 @@
           if (state.charts.gains) state.charts.gains.render(1);
           if (state.charts.donut) state.charts.donut.render(1);
           if (state.charts.priceTiers) state.charts.priceTiers.render(1);
+          if (state.charts.boosterYield) state.charts.boosterYield.render(1);
         }, 60);
       });
     });
@@ -2957,6 +3514,32 @@
         if (_currentModalCard) deleteCard(_currentModalCard.id);
       });
     }
+
+    // Contrôles du graphique de rendement temporel des boosters
+    const btnViewHourly = document.getElementById('btn-view-hourly');
+    const btnViewDaily = document.getElementById('btn-view-daily');
+
+    if (btnViewHourly) {
+      btnViewHourly.addEventListener('click', () => {
+        if (btnViewHourly.classList.contains('active')) return;
+        btnViewHourly.classList.add('active');
+        if (btnViewDaily) btnViewDaily.classList.remove('active');
+        if (state.charts.boosterYield) {
+          state.charts.boosterYield.setView('hourly');
+        }
+      });
+    }
+
+    if (btnViewDaily) {
+      btnViewDaily.addEventListener('click', () => {
+        if (btnViewDaily.classList.contains('active')) return;
+        btnViewDaily.classList.add('active');
+        if (btnViewHourly) btnViewHourly.classList.remove('active');
+        if (state.charts.boosterYield) {
+          state.charts.boosterYield.setView('daily');
+        }
+      });
+    }
   }
 
   function showToast(message, type = 'info') {
@@ -2993,6 +3576,10 @@
       'donut-center-label'
     );
     state.charts.priceTiers = new PriceTierBarChart('canvas-price-tiers');
+    state.charts.boosterYield = new BoosterYieldTemporalChart(
+      'canvas-booster-yield',
+      'tooltip-booster-yield'
+    );
 
     initEventListeners();
     initTableControls();
