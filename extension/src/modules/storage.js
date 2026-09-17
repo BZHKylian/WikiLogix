@@ -459,6 +459,7 @@ export async function recordCardInSession(cardData, metadata = {}) {
       lastPrice: cardData.lastPrice || cachedMarket?.lastPrice || (pricing.avgPrice > 0 ? pricing.avgPrice : 0),
       salesCount: cardData.salesCount || cachedMarket?.salesCount || (pricing.avgPrice > 0 ? 1 : 0),
       hasRealMarketPrice: hasRealMarketPrice,
+      status: cardData.status || null,
       timestamp: now
     };
 
@@ -898,5 +899,69 @@ export function getMatchingDiscordRules(cardData, config) {
  */
 export function matchesDiscordFilters(cardData, config) {
   return getMatchingDiscordRules(cardData, config).length > 0;
+}
+
+/**
+ * Met à jour le statut d'une carte (vendu / échangé / null) dans le cache de l'extension
+ */
+export async function updateCardStatus(cardId, status) {
+  return enqueueStorage(async () => {
+    const data = await getStorageData([STORAGE_KEYS.CARDS, STORAGE_KEYS.BOOSTERS]);
+    let cards = data[STORAGE_KEYS.CARDS] || [];
+    let boosters = data[STORAGE_KEYS.BOOSTERS] || [];
+    let updated = false;
+
+    cards = cards.map((c) => {
+      if (c.id === cardId) {
+        updated = true;
+        return { ...c, status: status || null };
+      }
+      return c;
+    });
+
+    boosters = boosters.map((b) => {
+      if (Array.isArray(b.cards)) {
+        b.cards = b.cards.map((c) => {
+          if (c.id === cardId) {
+            return { ...c, status: status || null };
+          }
+          return c;
+        });
+      }
+      return b;
+    });
+
+    if (updated) {
+      await setStorageData({
+        [STORAGE_KEYS.CARDS]: cards,
+        [STORAGE_KEYS.BOOSTERS]: boosters
+      });
+    }
+
+    return { success: updated, cardId, status: status || null };
+  });
+}
+
+/**
+ * Supprime définitivement une carte de l'historique et des boosters
+ */
+export async function deleteCardRecord(cardId) {
+  return enqueueStorage(async () => {
+    const data = await getStorageData([STORAGE_KEYS.CARDS, STORAGE_KEYS.BOOSTERS]);
+    let cards = (data[STORAGE_KEYS.CARDS] || []).filter((c) => c.id !== cardId);
+    let boosters = (data[STORAGE_KEYS.BOOSTERS] || []).map((b) => {
+      if (Array.isArray(b.cards)) {
+        b.cards = b.cards.filter((c) => c.id !== cardId);
+      }
+      return b;
+    });
+
+    await setStorageData({
+      [STORAGE_KEYS.CARDS]: cards,
+      [STORAGE_KEYS.BOOSTERS]: boosters
+    });
+
+    return { success: true, cardId };
+  });
 }
 

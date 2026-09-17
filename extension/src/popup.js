@@ -263,12 +263,19 @@ function renderRecentCards(recentCards) {
       ? `Revente : ${minP.toLocaleString('fr-FR')} - ${maxP.toLocaleString('fr-FR')} 🪙`
       : (minP > 0 ? `Revente : ${minP.toLocaleString('fr-FR')} 🪙` : `Revente : 0 🪙`);
 
+    const statusBadgeHtml = card.status === 'sold'
+      ? `<span style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.35);padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px;">🏷️ Vendu</span>`
+      : card.status === 'traded'
+        ? `<span style="background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.35);padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px;">🔄 Échangé</span>`
+        : '';
+
     const itemEl = document.createElement('div');
     itemEl.className = 'recent-item';
     itemEl.innerHTML = `
       <div class="recent-card-info">
         <div class="recent-card-name" title="${card.name}">
           <span>${card.name}</span>
+          ${statusBadgeHtml}
           ${statsDetail}
         </div>
         <div class="recent-card-prices">

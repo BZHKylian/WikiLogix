@@ -4,6 +4,8 @@ import {
   setStorageData,
   recordCardInSession,
   updateCardMarketPrice,
+  updateCardStatus,
+  deleteCardRecord,
   getStats,
   clearHistory,
   exportDataAsJSON,
@@ -360,6 +362,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           break;
         }
 
+        case 'UPDATE_CARD_STATUS': {
+          const cardId = message.cardId || message.payload?.cardId;
+          const status = message.status !== undefined ? message.status : message.payload?.status;
+          const result = await updateCardStatus(cardId, status);
+          sendResponse({ success: true, result });
+          break;
+        }
+
+        case 'DELETE_CARD': {
+          const cardId = message.cardId || message.payload?.cardId;
+          const result = await deleteCardRecord(cardId);
+          await updateExtensionBadge();
+          sendResponse({ success: true, result });
+          break;
+        }
+
         case 'SEND_DISCORD_NOTIFICATION': {
           const result = await sendCardToDiscord(message.payload);
           // Déclencher aussi la notification push native (fix bug prix=0 dans push)
@@ -463,6 +481,16 @@ if (chrome.runtime.onMessageExternal) {
         } else if (message.action === 'saveWikiMastersConfig' || message.type === 'SAVE_DISCORD_CONFIG') {
           const saved = await saveDiscordConfig(message.config || message.payload);
           sendResponse({ success: true, data: saved });
+        } else if (message.type === 'UPDATE_CARD_STATUS' || message.action === 'updateCardStatus') {
+          const cardId = message.cardId || message.payload?.cardId;
+          const status = message.status !== undefined ? message.status : message.payload?.status;
+          const result = await updateCardStatus(cardId, status);
+          sendResponse({ success: true, data: result });
+        } else if (message.type === 'DELETE_CARD' || message.action === 'deleteCard') {
+          const cardId = message.cardId || message.payload?.cardId;
+          const result = await deleteCardRecord(cardId);
+          await updateExtensionBadge();
+          sendResponse({ success: true, data: result });
         } else {
           sendResponse({ success: false, error: 'Action inconnue' });
         }

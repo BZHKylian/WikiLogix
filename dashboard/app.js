@@ -2098,15 +2098,25 @@
       try {
         state.cards = JSON.parse(savedCards);
         // Si les cartes stockées sont uniquement les 25 cartes mock de démonstration,
-        // les rafraîchir avec la répartition multi-jours
+        // les rafraîchir avec la répartition multi-jours tout en préservant scrupuleusement les statuts (vendu/échangé)
         if (Array.isArray(state.cards) && state.cards.length === 25 && state.cards.every((c) => c.id && c.id.startsWith('card_demo_'))) {
-          state.cards = [...INITIAL_MOCK_CARDS];
+          const statusMap = new Map(state.cards.map((c) => [c.id, c.status]));
+          state.cards = INITIAL_MOCK_CARDS.map((c) => ({
+            ...c,
+            status: statusMap.get(c.id) !== undefined ? statusMap.get(c.id) : (c.status || null)
+          }));
         }
       } catch (_) {
         state.cards = [...INITIAL_MOCK_CARDS];
       }
     } else {
       state.cards = [...INITIAL_MOCK_CARDS];
+    }
+
+    // Restaurer le filtre par statut s'il a été sauvegardé
+    const savedStatus = localStorage.getItem('wm_selected_status');
+    if (savedStatus) {
+      state.selectedStatus = savedStatus;
     }
 
     const savedConfig = localStorage.getItem('wm_cached_discord_config');
@@ -2136,6 +2146,9 @@
     try {
       localStorage.setItem('wm_cached_cards', JSON.stringify(state.cards));
       localStorage.setItem('wm_cached_discord_config', JSON.stringify(state.discordConfig));
+      if (state.selectedStatus) {
+        localStorage.setItem('wm_selected_status', state.selectedStatus);
+      }
       if (state.extensionId) {
         localStorage.setItem('wm_extension_id', state.extensionId);
       }
@@ -2592,11 +2605,20 @@
 
     // Filtres par statut (Tous, Vendu, Échangé, Disponible)
     const statusChips = document.querySelectorAll('.filter-chip-status, .filter-chip[data-status]');
+    if (state.selectedStatus) {
+      statusChips.forEach((c) => {
+        const s = c.getAttribute('data-status') || 'ALL';
+        c.classList.toggle('active', s === state.selectedStatus);
+      });
+    }
     statusChips.forEach((chip) => {
       chip.addEventListener('click', () => {
         statusChips.forEach((c) => c.classList.remove('active'));
         chip.classList.add('active');
         state.selectedStatus = chip.getAttribute('data-status') || 'ALL';
+        try {
+          localStorage.setItem('wm_selected_status', state.selectedStatus);
+        } catch (_) {}
         state.currentPage = 1;
         renderCardsTable();
       });
@@ -3003,6 +3025,10 @@
 
     persistData();
     renderCardsTable();
+
+    // Synchronisation immédiate avec l'extension Chrome (inscription dans son stockage local)
+    syncCardStatusWithExtension(cardId, card.status);
+
     // Ré-ouvrir la modale avec les nouvelles données
     openCardDetailModal(card);
   }
@@ -3017,7 +3043,41 @@
     persistData();
     updateDashboardData();
     closeCardDetailModal();
+
+    // Synchronisation de la suppression avec l'extension Chrome
+    syncCardDeleteWithExtension(cardId);
+
     showToast('Carte "' + card.name + '" supprimée.', 'info');
+  }
+
+  function syncCardStatusWithExtension(cardId, status) {
+    const extId = state.extensionId?.trim();
+    if (!extId || typeof window.chrome === 'undefined' || !window.chrome.runtime?.sendMessage) return;
+
+    try {
+      window.chrome.runtime.sendMessage(
+        extId,
+        { action: 'updateCardStatus', cardId, status: status || null },
+        () => {
+          if (window.chrome.runtime.lastError) {
+            // Extension indisponible ou hors ligne
+          }
+        }
+      );
+    } catch (_) {}
+  }
+
+  function syncCardDeleteWithExtension(cardId) {
+    const extId = state.extensionId?.trim();
+    if (!extId || typeof window.chrome === 'undefined' || !window.chrome.runtime?.sendMessage) return;
+
+    try {
+      window.chrome.runtime.sendMessage(
+        extId,
+        { action: 'deleteCard', cardId },
+        () => {}
+      );
+    } catch (_) {}
   }
 
   // ==========================================================================
@@ -3031,10 +3091,13 @@
     const totalPrice = Array.isArray(cards) ? cards.reduce((acc, c) => acc + (Number(c.avgPrice) || 0), 0) : 0;
     const lastCard = Array.isArray(cards) && cards.length > 0 ? cards[cards.length - 1] : null;
     const lastCardId = lastCard ? (lastCard.id || `${lastCard.name}_${lastCard.timestamp}`) : '';
+    const statusSignature = Array.isArray(cards)
+      ? cards.filter((c) => c.status).map((c) => `${c.id || c.name}:${c.status}`).join(';')
+      : '';
     const boostersLen = Array.isArray(boosters) ? boosters.length : 0;
     const configStr = discordConfig ? JSON.stringify(discordConfig) : '';
     const marketLen = marketPrices ? Object.keys(marketPrices).length : 0;
-    return `${cardsLen}_${totalPrice}_${lastCardId}_${boostersLen}_${marketLen}_${configStr}`;
+    return `${cardsLen}_${totalPrice}_${lastCardId}_${statusSignature}_${boostersLen}_${marketLen}_${configStr}`;
   }
 
   function syncWithExtension(isManual = false) {
@@ -3121,8 +3184,36 @@
     let hasConfigChanged = false;
 
     if (Array.isArray(data.cards)) {
-      if (data.cards.length !== state.cards.length || JSON.stringify(data.cards) !== JSON.stringify(state.cards)) {
-        state.cards = data.cards;
+      // Map des statuts locaux (vendu, échangé) pour ne jamais perdre les statuts configurés par l'utilisateur
+      const localStatusMap = new Map();
+      state.cards.forEach((c) => {
+        if (c.status) {
+          if (c.id) localStatusMap.set(c.id, c.status);
+          const fallbackKey = `${(c.name || '').trim().toLowerCase()}_${c.timestamp}`;
+          localStatusMap.set(fallbackKey, c.status);
+        }
+      });
+
+      const mergedCards = data.cards.map((incoming) => {
+        const fallbackKey = `${(incoming.name || '').trim().toLowerCase()}_${incoming.timestamp}`;
+        // Priorité au statut distant s'il est déjà défini dans l'extension, sinon préservation du statut local en cache
+        const finalStatus = incoming.status || localStatusMap.get(incoming.id) || localStatusMap.get(fallbackKey) || null;
+        return {
+          ...incoming,
+          status: finalStatus
+        };
+      });
+
+      // Synchroniser en retour vers l'extension les statuts locaux qui ne sont pas encore inscrits dans son stockage
+      mergedCards.forEach((card) => {
+        const incoming = data.cards.find((ic) => ic.id === card.id);
+        if (card.status && (!incoming || !incoming.status)) {
+          syncCardStatusWithExtension(card.id, card.status);
+        }
+      });
+
+      if (mergedCards.length !== state.cards.length || JSON.stringify(mergedCards) !== JSON.stringify(state.cards)) {
+        state.cards = mergedCards;
         hasCardsChanged = true;
       }
     }
